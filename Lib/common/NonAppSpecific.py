@@ -177,7 +177,6 @@ def move_mouse_to_element(driver, element):
     :param element:
     """
     scroll_element_to_center(driver, element)
-    time.sleep(10)
     hiddenPixels = driver.execute_script("return window.pageYOffset")
     size = element.size
     y = element.location["y"] + size["height"]/2 - hiddenPixels + driver.get_window_size()["height"] -\
