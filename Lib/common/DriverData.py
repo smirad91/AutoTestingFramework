@@ -1,7 +1,7 @@
 """
 Class used for holding information about browser to test, device to test, orientation of device
 """
-import sys
+from ctypes import windll
 from selenium import webdriver
 from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.NonAppSpecific import is_forwarded, close_driver
@@ -55,6 +55,7 @@ class DriverData:
         else:
             self.log.info("Testing on desktop computer")
             self.driver.maximize_window()
+        windll.user32.BlockInput(True)
 
 
     def get_driver(self):

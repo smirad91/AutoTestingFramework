@@ -132,7 +132,6 @@ class ConnectScenesTour(CommonAction):
             button = self.btnHotSpot
         else:
             button = self.btnInfo
-        print(self.tourImage().location)
         move_mouse_to_middle_of_browser(self.log, self.driver)
         action_chains = ActionChains(self.driver)
         size = self.tourImage().size
