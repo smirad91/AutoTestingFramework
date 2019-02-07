@@ -1,0 +1,41 @@
+{"configuration": {
+  "pictures": "\"first.jpg\" \"second.jpg\" ",
+
+  "picturesInfo": [
+    ["first.jpg", "First picture", [{"Second":2717}], 4089]
+
+  ],
+  "payPalEmail": "buyerlee@gmail.com",
+  "payPalPassword": "qazwsxedc",
+
+  "facebookEmail": "email",
+  "facebookPass": "pass",
+
+  "usernameTrial": "smirad91",
+  "passwordTrial": "Kjdld2019#",
+  "emailTrial": "smirad91@gmail.com",
+
+  "usernameBasic": "ffgffygjghjff",
+  "passwordBasic": "fhfyffgggfjjffff#",
+  "emailBasic": "55f5ggfyhg5jjf465@gmail.com",
+
+  "tourName": "My first tour",
+  "tourAddress": "My address",
+  "tourDescription": "This is my first tour",
+
+  "picturesData": {
+                "path":"Tour1",
+                "scenes": [
+                {"fileName":"first.jpg", "title":"First picture", "hotSpots":["Second picture:2717", "Third picture:937"]},
+                {"fileName":"second.jpg", "title":"Second picture","hotSpots":["Third picture:501", "First picture:299"]},
+                {"fileName":"Foto.jpg", "title":"Third picture", "hotSpots":["First picture:397"]}
+                ]
+  },
+
+  "picturesDataToAdd": {
+                "path": "Tour2",
+                "scenes": [
+                {"fileName":"download.jpg", "title":"Second picture", "hotSpots":["Third picture:204"]}
+                ]
+  }
+}}
