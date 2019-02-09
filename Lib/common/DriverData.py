@@ -78,7 +78,7 @@ class DriverData:
                                     'deviceName': 'iPhone X'
                                 }}
             #binary = FirefoxBinary("C:\Program Files\Mozilla Firefox/firefox")
-            driver = webdriver.Firefox(firefox_profile=fprofile)#, firefox_binary=binary)
+            driver = webdriver.Firefox()#firefox_profile=fprofile)#, firefox_binary=binary)
             driver.maximize_window()
         elif driverString == "Chrome":
             driver = self.create_chrome_driver(mobileToTest, orientation)
