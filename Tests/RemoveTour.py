@@ -24,4 +24,4 @@ db = Dashboard(driver)
 db.view_edit_tour()
 
 es = EditScenes(driver)
-es.remove_tour_by_name(cl.get("tourName"))
+es.remove_tour_by_name(cl.get("tourName")+" edited")

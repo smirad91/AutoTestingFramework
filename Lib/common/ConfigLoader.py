@@ -4,7 +4,8 @@ Class for getting values from json files from Configuration folder
 
 import json
 import os
-from Lib.common.NonAppSpecific import is_forwarded
+from Lib.common.DriverData import is_forwarded
+
 
 class ConfigLoader:
 

@@ -71,13 +71,15 @@ class Log:
         :param msg: Message to log
         :type msg: str
         """
-        picturePath = os.path.join(Log.testLogFolderPath, str(Log.screenshotNumber)+".png")
+        screenshotName = str(Log.screenshotNumber) + ".png"
+        picturePath = os.path.join(Log.testLogFolderPath, screenshotName)
         Log.screenshotNumber += 1
         if fullScreen:
             pyautogui.screenshot(picturePath)
         else:
             Log.driver.save_screenshot(picturePath)
-        logging.getLogger().info("<p><a href='{}'><img src='{}' height='150px' width='200px'></img></a><br>{}</p>".format(picturePath, picturePath,msg))
+        logging.getLogger().info("<p><a href='{}'><img src='{}' height='150px' width='200px'></img></a><br>{}</p>".format(screenshotName, screenshotName,msg))
+
 
     def exit_handler(self):
         """

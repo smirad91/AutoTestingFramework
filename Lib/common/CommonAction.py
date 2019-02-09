@@ -2,10 +2,12 @@
     Example shown in file CreateEditTourConnectScenes.py"""
 import time
 import pyautogui
+from selenium import webdriver
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.common.keys import Keys
 
-from Lib.common.NonAppSpecific import scroll_to_element, scroll_up_by
+from Lib.common.DriverData import DriverData
+from Lib.common.NonAppSpecific import scroll_to_element, scroll_up_by, scroll_element_to_center
 
 
 class CommonAction:
@@ -84,3 +86,39 @@ def get_hotSpots(log, driver):
     allHotSpots = driver.find_elements_by_css_selector("div[class^='pnlm-hotspot-base']")
     log.info("Number of hotSpots are={}".format(len(allHotSpots)))
     return allHotSpots
+
+
+def get_client_height():
+    if DriverData.fullHeight is None:
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--disable-infobars")
+        driver2 = webdriver.Chrome(chrome_options=chrome_options)
+        driver2.maximize_window()
+        time.sleep(2)
+        clientHeight = driver2.get_window_size()["height"] - int(
+            driver2.find_element_by_tag_name("html").get_attribute("clientHeight"))
+        DriverData.fullHeight = clientHeight
+        driver2.close()
+    else:
+        return DriverData.fullHeight
+    return clientHeight
+
+
+def move_mouse_to_element(driver, element):
+    """
+    Move mouse with pyautogui library to element
+
+    :param driver:
+    :param element:
+    """
+    scroll_element_to_center(driver, element)
+    hiddenPixels = driver.execute_script("return window.pageYOffset")
+
+    clientHeight = get_client_height()
+
+    time.sleep(1)
+    size = element.size
+    y = element.location["y"] + size["height"]/2 - hiddenPixels + clientHeight
+    x = element.location["x"] + size["width"]/2
+    pyautogui.moveTo(x, y, duration=1)
+    time.sleep(1)

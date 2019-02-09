@@ -124,7 +124,7 @@ class UploadScenesTour(CommonAction):
         """
         self.log.info("Execute method wait_scenes_uploaded with parameters"
                       " timeout={}".format(timeout))
-        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("div[qq-drop-area-text='Drop files here']")), timeout)
+        #wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("div[qq-drop-area-text='Drop files here']")), timeout)
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("h3[id='toplimit']")), timeout)
 
     def check_number_of_uploaded_scenes(self, numberBeforeUpload, numberToUpload):
@@ -139,8 +139,6 @@ class UploadScenesTour(CommonAction):
         """
         self.log.info("Execute method check_number_of_uploaded_scenes with parameters "
                       "numberBeforeUpload={}, numberToUpload={}".format(numberBeforeUpload, numberToUpload))
-        actualyUploadedScenes = self.get_number_uploaded_scenes()
-        wait_until(lambda: numberBeforeUpload + numberToUpload == self.get_number_uploaded_scenes(), 30)
-        if actualyUploadedScenes != numberBeforeUpload + numberToUpload:
-            raise Exception("Number of files that should be loaded={} are not the "
+        wait_until(lambda: numberBeforeUpload + numberToUpload == self.get_number_uploaded_scenes(), 30,
+                   errorMessage="Number of files that should be loaded={} are not the "
                             "same as actual uploaded scenes".format(numberToUpload))

@@ -1,14 +1,23 @@
 """
 Class used for holding information about browser to test, device to test, orientation of device
 """
+import json
+import os
+import sys
 from ctypes import windll
 from selenium import webdriver
-from Lib.common.ConfigLoader import ConfigLoader
-from Lib.common.NonAppSpecific import is_forwarded, close_driver
+from selenium.webdriver import FirefoxProfile
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+
 from Lib.common.Log import Log
+from Lib.common.NonAppSpecific import close_driver
 
 
 class DriverData:
+
+    mobile = False
+    driver = ""
+    fullHeight = None
 
     def __init__(self, driver="Firefox", mobileToTest=None, orientation="Portrait"):
         """
@@ -26,36 +35,23 @@ class DriverData:
         :param orientation: Used only if mobileToTest is forwarded. Possible values: Portrait and Landscape
         :type orientation: str
         """
-        forwardedDriver = is_forwarded("driver")
-        if forwardedDriver is not None:
-            driver = forwardedDriver
-        self.driver = self._create_driver(driver)
-        self.log = Log(self.driver)
-        self.log.info("Driver to create is={}".format(driver))
+        if windll.user32.BlockInput(True) == 0:
+            print("Not running as admin")
+        if is_forwarded("browser") is not None:
+            driver = is_forwarded("browser")
+        DriverData.driver = driver
         if is_forwarded("mobile") is not None:
             mobileToTest = is_forwarded("mobile")
         if mobileToTest is not None:
-            self.log.info("Testing mobile={}".format(mobileToTest))
-            if is_forwarded("orientation") is not None:
-                orientation = is_forwarded("orientation")
-            self.log.info("Orientation={}".format(orientation))
-            mobileTesting = ConfigLoader("MobileTesting.json", False)
-            mobileSize = mobileTesting.get(mobileToTest)
-            size = mobileSize.split("*")
-            if orientation == "Portrait":
-                winSizeX = size[0]
-                winSizeY = size[1]
-            elif orientation == "Landscape":
-                winSizeX = size[1]
-                winSizeY = size[0]
-            else:
-                raise Exception("Orientation supported are Portrait and Landscape")
-            self.driver.set_window_size(winSizeX, winSizeY)
-            self.driver.set_window_position(0, 0)
+            DriverData.mobile = True
+        if is_forwarded("orientation") is not None:
+            orientation = is_forwarded("orientation")
+        self.driver = self._create_driver(driver, mobileToTest, orientation)
+        self.log = Log(self.driver)
+        if mobileToTest is not None:
+            self.log.info("Driver to create is={}, on mobile={} and orientation={}".format(driver, mobileToTest, orientation))
         else:
-            self.log.info("Testing on desktop computer")
-            self.driver.maximize_window()
-        windll.user32.BlockInput(True)
+            self.log.info("Driver to create is={}. Testing on desktop computer".format(driver))
 
 
     def get_driver(self):
@@ -65,7 +61,7 @@ class DriverData:
         """
         return self.driver
 
-    def _create_driver(self, driverString):
+    def _create_driver(self, driverString, mobileToTest, orientation):
         """
         Create driver instance
         :param driverString: Browser name
@@ -74,14 +70,74 @@ class DriverData:
         :rtype: WebDriver
         """
         if driverString == "Firefox":
-            driver = webdriver.Firefox()
+            fprofile = FirefoxProfile()
+            fprofile.add_extension()
+            fprofile.set_preference("general.useragent.override", "https://addons.mozilla.org/en-US/firefox/addon/uaswitcher/")#"Mozilla/5.0 (Linux; Android 6.0; HTC One M9 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.98 Mobile Safari/537.36")
+            capabilities = {'browserName': 'firefox',
+                            'agent': {
+                                    'deviceName': 'iPhone X'
+                                }}
+            #binary = FirefoxBinary("C:\Program Files\Mozilla Firefox/firefox")
+            driver = webdriver.Firefox(firefox_profile=fprofile)#, firefox_binary=binary)
+            driver.maximize_window()
         elif driverString == "Chrome":
+            driver = self.create_chrome_driver(mobileToTest, orientation)
+        else:
+            raise Exception("Supported drivers are Firefox and Chrome. You forwarded {}".format(driverString))
+        return driver
+
+    def create_chrome_driver(self, mobileToTest, orientation):
+        if mobileToTest is not None:
+            chrome_options = webdriver.ChromeOptions()
+            found_mobile = False
+            if orientation == "Portrait":
+                deviceMetrics = {"deviceName": mobileToTest}
+            elif orientation == "Landscape":
+                deviceMetric = None
+                with open(os.getenv('LocalAppData') + "\\Google\\Chrome\\User Data\\Default\\Preferences",
+                          encoding="utf8", mode="r") as f:
+                    parsed = json.loads(f.read())
+                    allPhones = json.loads(parsed["devtools"]["preferences"]["standardEmulatedDeviceList"])
+                    for i in allPhones:
+                        if i["title"] == mobileToTest:
+                            deviceMetric = i["screen"]["horizontal"]
+                            found_mobile = True
+                            break
+                deviceMetrics = {"deviceMetrics": deviceMetric}
+            else:
+                raise Exception("Orientation must be Portrait or Landscape, forwarded is {}".format(orientation))
+            if orientation == "Landscape" and not found_mobile:
+                raise Exception("Mobile {} not found for chrome driver".format(mobileToTest))
+            chrome_options.add_experimental_option("mobileEmulation", deviceMetrics)
+            chrome_options.add_argument("--disable-infobars")
+            driver = webdriver.Chrome(chrome_options=chrome_options)
+            driver.maximize_window()
+        else:
             chrome_options = webdriver.ChromeOptions()
             chrome_options.add_argument("--disable-infobars")
             driver = webdriver.Chrome(chrome_options=chrome_options)
-        else:
-            raise Exception("Supported drivers are Firefox and Chrome")
+            driver.maximize_window()
         return driver
 
     def close(self):
         close_driver(self.driver)
+
+
+def is_forwarded(argument):
+    """
+    Used for getting arguments from python command. Python command example:
+    python Test.py --browser=Firefox --config=Case1 --mobile="galaxyS9/S9+" --orientation=Landscape
+
+    :param argument: Argument name
+    :type argument: str
+    :return: Value of argument or None
+    :rtype: None or str
+    """
+    try:
+        for arg in sys.argv:
+            if argument in arg.split("=")[0]:
+                return arg.split("=")[1]
+    except:
+        pass
+
+
