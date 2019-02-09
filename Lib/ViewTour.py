@@ -48,6 +48,7 @@ class ViewTour:
             self.btnShowAllScenes().click()
             wait_until(lambda: self.paneGallery().is_displayed(), timeout=30)
         self.driver.find_element_by_xpath("//h5[contains(text(),'{}')]".format(name)).click()
+        ConnectScenesTour(self.driver).wait_scene_load()
         self.btnShowAllScenes().click()
 
     def _check_hotSpot_in_center(self, goingToScene):

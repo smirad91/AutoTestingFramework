@@ -5,6 +5,9 @@ import time
 
 from Lib.common.CommonAction import CommonAction
 from Lib.common.Log import Log
+from Lib.common.NonAppSpecific import check_if_elem_exist
+from Lib.common.WaitAction import wait_until
+
 
 class HomePage(CommonAction):
     def __init__(self, driver):
@@ -30,6 +33,7 @@ class HomePage(CommonAction):
         self.log.info("Go to log in page")
         if not self.btnLogIn().is_displayed():
             self.btnOpenMenu().click()
+            wait_until(lambda: check_if_elem_exist(self.btnLogInMobile), timeout=5)
             self.btnLogInMobile().click()
         else:
             self.btnLogIn().click()

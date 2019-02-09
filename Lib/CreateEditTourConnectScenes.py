@@ -59,6 +59,7 @@ class ConnectScenesTour(CommonAction):
         return self.driver.find_element_by_css_selector("img[src*='left-arrow.svg']")
 
     def btnDeleteHotSpot(self):
+        wait_until(lambda: check_if_elem_exist(self.divHotSpotMenu), timeout=10)
         return self.divHotSpotMenu().find_element_by_css_selector("a[id*='hotSpotDelete']")
 
     def btnEditHotSpot(self):
@@ -119,33 +120,6 @@ class ConnectScenesTour(CommonAction):
         wait_until(lambda: self.btnChangeTheme().find_element_by_tag_name("img").get_attribute("src") == themeSrc, timeout=20)
         self.log.screenshot("Theme is updated")
 
-    # def _add_button_to_center(self, hotSpot=True):
-    #     """
-    #     Puts hotSpot or info in center of scene.
-    #
-    #     :param hotSpot: True if hotSpot is added, False if info is added
-    #     :type hotSpot: bool
-    #     """
-    #     self.log.info("Execute method _add_button_to_center")
-    #     if hotSpot:
-    #         button = self.btnHotSpot
-    #     else:
-    #         button = self.btnInfo
-    #     move_mouse_to_middle_of_browser(self.log, self.driver)
-    #     action_chains = ActionChains(self.driver)
-    #     size = self.tourImage().size
-    #     self.click_on_element(button())
-    #     click_and_hold_with_scroll(self.log, self.driver, action_chains, button)
-    #     time.sleep(1)
-    #     scroll_element_to_center(self.driver, self.tourImage())
-    #     time.sleep(0.5)
-    #     pyautogui.moveRel(20, 20, 2)
-    #     time.sleep(0.5)
-    #     action_chains.move_to_element_with_offset(self.tourImage(), size["width"] / 2, size["height"] / 2).perform()
-    #     time.sleep(0.5)
-    #     action_chains.release().perform()
-    #     time.sleep(1)
-    #     self.log.screenshot("Button is added")
 
     def _add_button_to_center(self, hotSpot=True):
         """
@@ -163,9 +137,7 @@ class ConnectScenesTour(CommonAction):
         time.sleep(1)
         pyautogui.mouseDown(duration=1)
         move_mouse_to_element(self.driver, self.tourImage())
-        #scroll_element_to_center(self.driver, self.tourImage())
         time.sleep(1)
-        pyautogui.moveRel(0, 5, duration=1)
         pyautogui.mouseUp(duration=1)
         time.sleep(1)
         self.log.screenshot("Button is added")
@@ -216,17 +188,16 @@ class ConnectScenesTour(CommonAction):
         :type clickNumber: int
         """
         self.log.info("Execute method rotate with parameters right={}, clickNumber={}".format(right, clickNumber))
-        if clickNumber == 0:
-            self.btnRighRotate().click()
-            self.btnLeftRotate().click()
-        if right:
-            button = self.btnRighRotate()
-        else:
-            button = self.btnLeftRotate()
-        for i in range(clickNumber):
-            time.sleep(2)
-            button.click()
-            time.sleep(2)
+        if clickNumber != 0:
+            if right:
+                button = self.btnRighRotate
+            else:
+                button = self.btnLeftRotate
+            for i in range(clickNumber):
+                time.sleep(2)
+                wait_until(lambda: check_if_elem_exist(button), timeout=10)
+                button().click()
+                time.sleep(2)
         self.log.screenshot("Rotate is done")
 
     def rotate_scene(self, pixels, width):
@@ -347,17 +318,12 @@ class ConnectScenesTour(CommonAction):
 
 
     def open_menu_hotSpotOrInfo_center(self):
-        action_chains = ActionChains(self.driver)
         time.sleep(1)
-        scroll_element_to_center(self.driver, self.tourImage())
+        move_mouse_to_element(self.driver, self.get_hotspot_from_center())
         time.sleep(1)
-        size = self.tourImage().size
-        action_chains.move_to_element_with_offset(self.tourImage(), size["width"] / 2, size["height"] / 2).perform()
-        time.sleep(1)
-        action_chains.click().perform()
+        pyautogui.click()
         wait_until(lambda: check_if_elem_exist(self.btnDeleteHotSpot), timeout=10)
         self.log.screenshot("Clicked on hotspot")
-
 
     def edit_hotSpot_center(self):
         self.log.info("Execute method edit_hotSpot_center")
