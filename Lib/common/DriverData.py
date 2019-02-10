@@ -3,14 +3,16 @@ Class used for holding information about browser to test, device to test, orient
 """
 import json
 import os
-import sys
+import time
 from ctypes import windll
+
+import pyautogui
 from selenium import webdriver
 from selenium.webdriver import FirefoxProfile
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
+from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import close_driver
+from Lib.common.NonAppSpecific import close_driver, is_forwarded
 
 
 class DriverData:
@@ -66,48 +68,43 @@ class DriverData:
         Create driver instance
         :param driverString: Browser name
         :type driverString: str
+        user_pref("devtools.responsive.userAgent", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/12.0 Mobile/15A372 Safari/604.1");
+
         :return: driver
-        :rtype: WebDriver
+        :rtype: WebDriver  devtools.responsive.userAgent
         """
         if driverString == "Firefox":
-            fprofile = FirefoxProfile()
-            fprofile.add_extension()
-            fprofile.set_preference("general.useragent.override", "https://addons.mozilla.org/en-US/firefox/addon/uaswitcher/")#"Mozilla/5.0 (Linux; Android 6.0; HTC One M9 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.98 Mobile Safari/537.36")
-            capabilities = {'browserName': 'firefox',
-                            'agent': {
-                                    'deviceName': 'iPhone X'
-                                }}
-            #binary = FirefoxBinary("C:\Program Files\Mozilla Firefox/firefox")
-            driver = webdriver.Firefox()#firefox_profile=fprofile)#, firefox_binary=binary)
-            driver.maximize_window()
+            driver = self.create_firefox_driver(mobileToTest, orientation)
         elif driverString == "Chrome":
             driver = self.create_chrome_driver(mobileToTest, orientation)
         else:
             raise Exception("Supported drivers are Firefox and Chrome. You forwarded {}".format(driverString))
         return driver
 
+    def create_firefox_driver(self, mobileToTest, orientation):
+        if mobileToTest is not None:
+            fprofile = FirefoxProfile()
+            size = self.get_mobile_size(mobileToTest, orientation)
+            fprofile.set_preference("devtools.responsive.viewport.width", size["width"])
+            fprofile.set_preference("devtools.responsive.viewport.height", size["height"])
+            driver = webdriver.Firefox(firefox_profile=fprofile)
+            driver.maximize_window()
+            time.sleep(3)
+            pyautogui.keyDown("ctrl")
+            pyautogui.keyDown("shift")
+            pyautogui.typewrite("m")
+            pyautogui.keyUp("ctrl")
+            pyautogui.keyUp("shift")
+        else:
+            driver = webdriver.Firefox()
+            driver.maximize_window()
+        return driver
+
     def create_chrome_driver(self, mobileToTest, orientation):
         if mobileToTest is not None:
             chrome_options = webdriver.ChromeOptions()
-            found_mobile = False
-            if orientation == "Portrait":
-                deviceMetrics = {"deviceName": mobileToTest}
-            elif orientation == "Landscape":
-                deviceMetric = None
-                with open(os.getenv('LocalAppData') + "\\Google\\Chrome\\User Data\\Default\\Preferences",
-                          encoding="utf8", mode="r") as f:
-                    parsed = json.loads(f.read())
-                    allPhones = json.loads(parsed["devtools"]["preferences"]["standardEmulatedDeviceList"])
-                    for i in allPhones:
-                        if i["title"] == mobileToTest:
-                            deviceMetric = i["screen"]["horizontal"]
-                            found_mobile = True
-                            break
-                deviceMetrics = {"deviceMetrics": deviceMetric}
-            else:
-                raise Exception("Orientation must be Portrait or Landscape, forwarded is {}".format(orientation))
-            if orientation == "Landscape" and not found_mobile:
-                raise Exception("Mobile {} not found for chrome driver".format(mobileToTest))
+            mobileSize = self.get_mobile_size(mobileToTest, orientation)
+            deviceMetrics = {"deviceMetrics": mobileSize}
             chrome_options.add_experimental_option("mobileEmulation", deviceMetrics)
             chrome_options.add_argument("--disable-infobars")
             driver = webdriver.Chrome(chrome_options=chrome_options)
@@ -119,25 +116,43 @@ class DriverData:
             driver.maximize_window()
         return driver
 
+    def get_mobile_size(self, mobileToTest, orientation):
+        cl = ConfigLoader(file="MobileTesting.json", lookArgs=False)
+        size = cl.get(mobileToTest).split("*")
+        firstSize = int(size[0])
+        secondSize = int(size[1])
+        if orientation == "Portrait":
+            if firstSize > secondSize:
+                x = secondSize
+                y = firstSize
+            else:
+                x = firstSize
+                y = secondSize
+        elif orientation == "Landscape":
+            if firstSize > secondSize:
+                x = firstSize
+                y = secondSize
+            else:
+                x = secondSize
+                y = firstSize
+        else:
+            raise Exception("Allowed orientation is Portrait and Landscape. Forwarded orientation is {}".format(orientation))
+        return {"width": x, "height": y}
+
     def close(self):
         close_driver(self.driver)
 
 
-def is_forwarded(argument):
+def get_standard_emulated_device_list(mobileToTest):
     """
-    Used for getting arguments from python command. Python command example:
-    python Test.py --browser=Firefox --config=Case1 --mobile="galaxyS9/S9+" --orientation=Landscape
-
-    :param argument: Argument name
-    :type argument: str
-    :return: Value of argument or None
-    :rtype: None or str
+    Return from preferences file from chrome mobile size
     """
-    try:
-        for arg in sys.argv:
-            if argument in arg.split("=")[0]:
-                return arg.split("=")[1]
-    except:
-        pass
-
-
+    with open(os.getenv('LocalAppData') + "\\Google\\Chrome\\User Data\\Default\\Preferences",
+              encoding="utf8", mode="r") as f:
+        parsed = json.loads(f.read())
+        allPhones = json.loads(parsed["devtools"]["preferences"]["standardEmulatedDeviceList"])
+        for i in allPhones:
+            if i["title"] == mobileToTest:
+                deviceMetric = i["screen"]["horizontal"]
+                break
+    return deviceMetric

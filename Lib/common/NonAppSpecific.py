@@ -2,6 +2,7 @@
 Methods that can be used for every site.
 """
 import os
+import sys
 import time
 
 import pyautogui
@@ -186,3 +187,21 @@ def close_driver(driver):
     for handle in driver.window_handles:
         driver.switch_to.window(handle)
         driver.close()
+
+
+def is_forwarded(argument):
+    """
+    Used for getting arguments from python command. Python command example:
+    python Test.py --browser=Firefox --config=Case1 --mobile="galaxyS9/S9+" --orientation=Landscape
+
+    :param argument: Argument name
+    :type argument: str
+    :return: Value of argument or None
+    :rtype: None or str
+    """
+    try:
+        for arg in sys.argv:
+            if argument in arg.split("=")[0]:
+                return arg.split("=")[1]
+    except:
+        pass
