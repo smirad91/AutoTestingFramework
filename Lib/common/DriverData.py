@@ -3,15 +3,12 @@ Class used for holding information about browser to test, device to test, orient
 """
 import json
 import os
-import sys
 import time
 from ctypes import windll
 
 import pyautogui
 from selenium import webdriver
 from selenium.webdriver import FirefoxProfile
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.webdriver import WebDriver
 
 from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.Log import Log
@@ -49,7 +46,6 @@ class DriverData:
         """
         if windll.user32.BlockInput(True) == 0:
            raise Exception("Not running script as admin")
-
         if is_forwarded("browser") is not None:
             driver = is_forwarded("browser")
         DriverData.driverName = driver

@@ -53,7 +53,7 @@ cs.edit_info_button_center("edited title", "edited name", "edited url")
 cs.delete_hotSpotOrInfo_center()
 
 log.info("Add, edit going to, go to and delete hotSpot button")
-cs._add_button_to_center()
+cs.add_button_to_center()
 cs.choose_arrow(1)
 cs.save_hotSpot()
 
