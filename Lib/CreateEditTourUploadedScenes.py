@@ -3,9 +3,7 @@ Class for manipulating with page https://sgpano.com/uploaded-scenes/
 """
 
 import time
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
 
 from Lib.CreateEditTourConnectScenes import ConnectScenesTour
 from Lib.CreateEditTourUploadScenes import UploadScenesTour
@@ -67,6 +65,9 @@ class UploadedScenesTour(CommonAction):
             if current_title == title:
                 self.log.info("Delete scene with title={}".format(title))
                 scene.find_element_by_css_selector("div[class='icon-delete']").click()
+                wait_until(lambda: check_if_elem_exist(self.btnDeleteSceneOk), timeout=10)
+                wait_until(expected_conditions.alert_is_present, timeout=10)
+                self.btnDeleteSceneOk()
                 self.btnDeleteSceneOk().click()
                 try:
                     wait_until(lambda: not check_if_elem_exist(self.btnDeleteSceneOk), timeout=10)

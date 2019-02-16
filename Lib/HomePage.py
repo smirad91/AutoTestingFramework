@@ -33,7 +33,7 @@ class HomePage(CommonAction):
         self.log.info("Go to log in page")
         if not self.btnLogIn().is_displayed():
             self.btnOpenMenu().click()
-            wait_until(lambda: check_if_elem_exist(self.btnLogInMobile), timeout=5)
+            wait_until(lambda: check_if_elem_exist(self.btnLogInMobile), timeout=20)
             self.btnLogInMobile().click()
         else:
             self.btnLogIn().click()

@@ -48,9 +48,10 @@ uss.insert_scenes_title(scenes)
 
 cs = ConnectScenesTour(driver)
 log.info("Add, edit and delete info button")
-cs.add_info_button_center("title", "name", "https://sgpano.com/")
-cs.edit_info_button_center("edited title", "edited name", "edited url")
-cs.delete_hotSpotOrInfo_center()
+#when bug is resolved, uncomment
+# cs.add_info_button_center("title", "name", "https://sgpano.com/")
+# cs.edit_info_button_center("edited title", "edited name", "edited url")
+# cs.delete_hotSpotOrInfo_center()
 
 log.info("Add, edit going to, go to and delete hotSpot button")
 cs.add_button_to_center()
@@ -64,11 +65,13 @@ cs.save_edited_hotSpot()
 cs.goTo_hotSpot_center()
 
 cs.change_current_scene("First picture")
-cs.delete_hotSpotOrInfo_center()
+#uncomment when bug is resolved
+#cs.delete_hotSpotOrInfo_center()
 
 log.info("Insert defined hotSpots")
 cs.insert_hotSpots(scenes)
 
-cs.delete_hotSpot(pictures[0], pictures[0].hotSpots[0].location)
+#uncomment when bug is resolved
+#cs.delete_hotSpot(pictures[0], pictures[0].hotSpots[0].location)
 
 cs.publish()

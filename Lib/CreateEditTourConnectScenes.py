@@ -228,10 +228,10 @@ class ConnectScenesTour(CommonAction):
             else:
                 button = self.btnLeftRotate
             for i in range(clickNumber):
-                time.sleep(2)
+                time.sleep(1.5)
                 wait_until(lambda: check_if_elem_exist(button), timeout=10)
                 button().click()
-                time.sleep(2)
+                time.sleep(1.5)
         self.log.screenshot("Rotate is done")
 
     def rotate_scene(self, pixels, width):
@@ -460,7 +460,12 @@ class ConnectScenesTour(CommonAction):
         self.log.screenshot("Click on delete hotspot")
         self.btnDeleteHotSpot().click()
         time.sleep(1)
-        alert = self.driver.switch_to.alert
+        try:
+            alert = self.driver.switch_to.alert
+        except Exception as es:
+            self.driver.log.info("First try to delete button not succeeded")
+            self.btnDeleteHotSpot()
+            alert = self.driver.switch_to.alert
         alert.accept()
         try:
             self.get_hotspot_from_center()
