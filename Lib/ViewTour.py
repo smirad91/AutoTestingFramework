@@ -46,7 +46,8 @@ class ViewTour:
         if not self.driver.find_element_by_css_selector("div[id='gallerypane']").is_displayed():
             self.log.info("Click on button show all scenes")
             self.btnShowAllScenes().click()
-            wait_until(lambda: self.paneGallery().is_displayed(), timeout=30)
+            wait_until(lambda: self.paneGallery().is_displayed, timeout=30)
+            self.log.screenshot("Gallery is displayed")
         self.driver.find_element_by_xpath("//h5[contains(text(),'{}')]".format(name)).click()
         ConnectScenesTour(self.driver).wait_scene_load()
         self.btnShowAllScenes().click()
@@ -68,7 +69,7 @@ class ViewTour:
                 size = hotSpot.size
                 centerOfBrowser = self.driver.find_element_by_tag_name("body").size["width"]/2
                 self.log.info("Check if hotspot with x location={} is on center={}".format(hotSpotLocationWidth, centerOfBrowser))
-                if abs(abs(hotSpotLocationWidth + size["width"]/2) - centerOfBrowser) < 10:  #allowed error of 5 pixels
+                if abs(abs(hotSpotLocationWidth + size["width"]/2) - centerOfBrowser) < 10:  #allowed error of 10 pixels
                     self.log.screenshot("Hotspot is in center")
                     self.log.info("Check if going to scene is as wanted")
                     if not check_if_elem_exist(lambda: hotSpot.find_element_by_xpath(

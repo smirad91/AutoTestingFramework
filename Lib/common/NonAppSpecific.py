@@ -120,7 +120,7 @@ def click_and_hold_with_scroll(log, driver, actionChains, func):
         actionChains.click_and_hold(func()).perform()
 
 
-def scroll_element_to_center(driver, element):
+def scroll_element_to_center(driver, log, element):
     """
     Scroll browser down or up so that element is on center of viewpoint.
 
@@ -129,16 +129,120 @@ def scroll_element_to_center(driver, element):
     """
     size = element.size
     location = element.location
-    viewPointHeight = int(driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
+    viewPointHeight = driver.execute_script("return window.innerHeight")
     if viewPointHeight > size["height"]:
         pom = (viewPointHeight-size["height"])/2
         driver.execute_script("scroll(0,{})".format(location["y"] - pom))
     else:
         pom = (size["height"]-viewPointHeight)/2
         driver.execute_script("scroll(0,{})".format(location["y"] + pom))
+    time.sleep(0.5)
+    log.screenshot("Element scrolled to view")
+
+def scroll_element_to_viewPoint_with_selenium(driver, element):
+    """
+    Scroll browser down or up so that element is on center of viewpoint.
+
+    :param element: Element to scroll on center
+    :type element: WebElement
+    """
+    location = element.location
+    driver.execute_script("scroll(0,{})".format(location["y"]))
 
 
-def move_mouse_to_middle_of_browser(log, driver):
+def is_location_on_viewpoint(driver, locationY):
+    hiddenPixels = driver.execute_script("return window.pageYOffset")
+    viewPointHeight = int(driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
+    if locationY < hiddenPixels + viewPointHeight and locationY > hiddenPixels:
+        return True
+    else:
+        return False
+
+
+def scroll_element_to_center_with_drag(driver, actionChains, fromElement, toElement):
+    """
+    Mouse on from element and its on view
+
+    :param element: Element to scroll on center
+    :type element: WebElement
+    """
+    fromSize = fromElement.size
+    fromLocation = fromElement.location
+
+    toSize = toElement.size
+    toLocation = toElement.location
+    viewPointHeight = int(driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
+    moveBy = int(viewPointHeight / 2)
+    i = 1
+    if fromLocation["y"] < toLocation["y"]:
+        #down
+        onViewPoint = False
+        while not onViewPoint:
+            if not is_location_on_viewpoint(driver, toElement.location["y"]+int(toSize["height"]/2)):
+                if i ==1:
+                    actionChains.move_by_offset(0, moveBy).perform()
+                else:
+                    actionChains.move_by_offset(5, 0).perform()
+                i +=1
+                time.sleep(3)
+                driver.execute_script("scrollBy(0,{})".format(moveBy))
+                time.sleep(2)
+            else:
+                actionChains.move_by_offset(5, 0).perform()
+                onViewPoint = True
+    else:
+        #up
+        driver.execute_script("scroll(0,{})".format(toLocation["height"]))
+
+
+# def scroll_element_to_center_with_drag(driver, actionChains, fromElement, toElement):
+#     """
+#     Mouse on from element and its on view
+#
+#     :param element: Element to scroll on center
+#     :type element: WebElement
+#     """
+#     fromSize = fromElement.size
+#     fromLocation = fromElement.location
+#
+#     toSize = toElement.size
+#     toLocation = toElement.location
+#     viewPointHeight = int(driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
+#     moveBy = int(viewPointHeight / 4)
+#     print("vph {}".format(viewPointHeight))
+#     if fromLocation["y"] < toLocation["y"]:
+#         #na dole
+#         print("na dole")
+#         onViewPoint = False
+#         while not onViewPoint:
+#             if not is_location_on_viewpoint(driver, toElement.location["y"]+int(toSize["height"]/2)):
+#                 print("before scroll")
+#                 print("moveBy {}".format(moveBy))
+#                 actionChains.move_by_offset(0, moveBy).perform()
+#                 time.sleep(10)
+#                 driver.execute_script("scrollBy(0,{})".format(moveBy))
+#                 time.sleep(2)
+#                 print("after scroll")
+#             else:
+#                 print("jeste na point")
+#                 onViewPoint = True
+#     else:
+#         #na gore
+#         print("na gore")
+#         driver.execute_script("scroll(0,{})".format(toLocation["height"]))
+
+
+
+    # viewPointHeight = int(driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
+    # if viewPointHeight > size["height"]:
+    #     pom = (viewPointHeight-size["height"])/2
+    #     driver.execute_script("scroll(0,{})".format(location["y"] - pom))
+    # else:
+    #     pom = (size["height"]-viewPointHeight)/2
+    #     driver.execute_script("scroll(0,{})".format(location["y"] + pom))
+
+
+def move_mouse_to_middle_of_browser2(log, driver):
     """
     Move mouse to the middle of browser viewpoint.
     """

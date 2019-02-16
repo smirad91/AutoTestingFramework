@@ -9,7 +9,9 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from Lib.common.CommonAction import CommonAction, get_hotSpots, move_mouse_to_element
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import scroll_element_to_center, check_if_elem_exist, send_text
+from Lib.common.NonAppSpecific import scroll_element_to_center, check_if_elem_exist, send_text, \
+    scroll_element_to_center_with_drag, scroll_element_to_viewPoint_with_selenium
+from Lib.common.DriverData import move_mouse_to_middle_of_browser, DriverData
 from Lib.common.WaitAction import wait_until
 
 
@@ -109,8 +111,10 @@ class ConnectScenesTour(CommonAction):
         :type number: int [1..4]
         """
         self.log.info("Execute method choose_theme with parameter number={}".format(number))
+        scroll_element_to_center(self.driver, self.log, self.btnChangeTheme())
+        time.sleep(3)
         self.btnChangeTheme().click()
-        wait_until(lambda: check_if_elem_exist(lambda: self.imgThemeToSelect(number)), timeout=5)
+        wait_until(lambda: check_if_elem_exist(lambda: self.imgThemeToSelect(number)), timeout=30)
         newTheme = self.imgThemeToSelect(number)
         themeSrc = newTheme.find_element_by_tag_name("img").get_attribute("src")
         newTheme.click()
@@ -121,7 +125,7 @@ class ConnectScenesTour(CommonAction):
         self.log.screenshot("Theme is updated")
 
 
-    def _add_button_to_center(self, hotSpot=True):
+    def _add_button_to_center_with_selenium(self, hotSpot):
         """
         Puts hotSpot or info in center of scene.
 
@@ -133,10 +137,40 @@ class ConnectScenesTour(CommonAction):
             button = self.btnHotSpot
         else:
             button = self.btnInfo
-        move_mouse_to_element(self.driver, button())
+        scroll_element_to_center(self.driver, self.log, button())
+        buttonSize = button().size
+        ac = ActionChains(self.driver)
+        time.sleep(3)
+        ac.move_to_element_with_offset(button(), buttonSize["width"]/2, buttonSize["height"]/2).perform()
+        time.sleep(3)
+        ac.click_and_hold().perform()
+        tourSize = self.tourImage().size
+        time.sleep(3)
+        scroll_element_to_viewPoint_with_selenium(self.driver, self.tourImage())
+        time.sleep(1)
+        move_mouse_to_middle_of_browser(self.log, self.driver)
+        time.sleep(1)
+        ac.move_to_element_with_offset(self.tourImage(), tourSize["width"]/2, tourSize["height"]/2).perform()
+        ac.release().perform()
+        time.sleep(1)
+        self.log.screenshot("Button is added")
+
+    def _add_button_to_center_pyautogui(self, hotSpot):
+        """
+        Puts hotSpot or info in center of scene.
+
+        :param hotSpot: True if hotSpot is added, False if info is added
+        :type hotSpot: bool
+        """
+        self.log.info("Execute method _add_button_to_center")
+        if hotSpot:
+            button = self.btnHotSpot
+        else:
+            button = self.btnInfo
+        move_mouse_to_element(self.driver, self.log, button())
         time.sleep(1)
         pyautogui.mouseDown(duration=1)
-        move_mouse_to_element(self.driver, self.tourImage())
+        move_mouse_to_element(self.driver, self.log, self.tourImage())
         time.sleep(1)
         pyautogui.mouseUp(duration=1)
         time.sleep(1)
@@ -169,12 +203,12 @@ class ConnectScenesTour(CommonAction):
                 size = hotSpot.size
                 tourSceneCenter = self.tourImage().size["width"]/2
                 self.log.info("Check if hotspot with x location={} is on center={}".format(hotSpotLocationWidth, tourSceneCenter))
-                if abs(abs(hotSpotLocationWidth + size["width"]/2) - tourSceneCenter) < 5:  #allowed error of 5 pixels
+                if abs(abs(hotSpotLocationWidth + size["width"]/2) - tourSceneCenter) <= 5:  #allowed error of 5 pixels
                     self.log.screenshot("Hotspot is in center")
                     hotSpotFound = hotSpot
                     return hotSpot
             except Exception as ex:
-                print(ex)
+                self.log.info(str(ex))
         if hotSpotFound is None:
             raise Exception("HotSpot is not in center")
 
@@ -254,7 +288,7 @@ class ConnectScenesTour(CommonAction):
         self.log.info("Execute method change_current_scene with title={}".format(title))
         self.driver.find_element_by_xpath("//h5[contains(text(),'{}')]".format(title)).click()
         self.wait_scene_load()
-        scroll_element_to_center(self.driver, self.tourImage())
+        scroll_element_to_center(self.driver, self.log, self.tourImage())
         self.log.screenshot("Current scene changed to {}".format(title))
 
     def wait_scene_load(self):
@@ -270,7 +304,7 @@ class ConnectScenesTour(CommonAction):
         Click on button panToView
         """
         self.log.info("Execute method pan_to_view")
-        self.click_on_element(self.btnPanToView())
+        self.click_on_element(self.btnPanToView)
         time.sleep(3)
 
     def insert_hotSpots(self, scenes):
@@ -285,10 +319,18 @@ class ConnectScenesTour(CommonAction):
             self.change_current_scene(scene.title)
             for hotSpot in scene.hotSpots:
                 self.rotate_scene(hotSpot.location, scene.width)
-                self._add_button_to_center()
+                self.add_button_to_center()
                 self._set_hotSpot_goingTo(hotSpot.goingToScene)
                 self.save_hotSpot()
                 self.pan_to_view()
+
+    def add_button_to_center(self, hotSpot=True):
+        if DriverData.driverName == "Firefox":
+            self._add_button_to_center_with_selenium(hotSpot)
+        elif DriverData.driverName == "Chrome":
+            self._add_button_to_center_pyautogui(hotSpot)
+        else:
+            pass
 
     def delete_hotSpot(self, scene, hotSpotLocation):
         """
@@ -318,10 +360,7 @@ class ConnectScenesTour(CommonAction):
 
 
     def open_menu_hotSpotOrInfo_center(self):
-        time.sleep(1)
-        move_mouse_to_element(self.driver, self.get_hotspot_from_center())
-        time.sleep(1)
-        pyautogui.click()
+        self.get_hotspot_from_center().click()
         wait_until(lambda: check_if_elem_exist(self.btnDeleteHotSpot), timeout=10)
         self.log.screenshot("Clicked on hotspot")
 
@@ -331,12 +370,11 @@ class ConnectScenesTour(CommonAction):
         self.btnEditHotSpot().click()
         time.sleep(1)
         self.log.info("Edit hotspot clicked")
-        move_mouse_to_element(self.driver, self.get_hotspot_from_center())
+        action_chains = ActionChains(self.driver)
+        scroll_element_to_center(self.driver, self.log, self.get_hotspot_from_center())
+        move_mouse_to_middle_of_browser(self.log, self.driver)
+        action_chains.drag_and_drop_by_offset(self.get_hotspot_from_center(), 5, 0).perform()
         time.sleep(1)
-        pyautogui.mouseDown()
-        pyautogui.moveRel(5, 0)
-        pyautogui.mouseUp()
-        time.sleep(3)
         self.log.screenshot("Edit for hotSpot is opened")
 
     def edit_hotSpot_goingTo(self, title):
@@ -365,7 +403,7 @@ class ConnectScenesTour(CommonAction):
         self.open_menu_hotSpotOrInfo_center()
         self.log.info("Clicked on hotspot")
         self.btnGoToHotSpot().click()
-        scroll_element_to_center(self.driver, self.tourImage())
+        scroll_element_to_center(self.driver, self.log, self.tourImage())
         time.sleep(1)
         self.log.screenshot("GoTo hotspot clicked")
         self.wait_scene_load()
@@ -389,7 +427,7 @@ class ConnectScenesTour(CommonAction):
         """
         self.log.info("Execute method add_info_button_center with parameters "
                       "title={}, name={}, url={}".format(title, name, url))
-        self._add_button_to_center(hotSpot=False)
+        self.add_button_to_center(hotSpot=False)
         self._add_info_data(title, name, url)
         self.log.info("Method add_info_button_center finished")
 
@@ -404,11 +442,9 @@ class ConnectScenesTour(CommonAction):
         time.sleep(2)
         action_chains.click(self.divHotSpotMenu().find_element_by_css_selector("a[onclick*='onInfoEdit']")).perform()
         time.sleep(2)
-        move_mouse_to_element(self.driver, self.get_hotspot_from_center())
-        time.sleep(1)
-        pyautogui.mouseDown()
-        pyautogui.moveRel(5, 0)
-        pyautogui.mouseUp()
+        scroll_element_to_center(self.driver, self.log, self.get_hotspot_from_center())
+        move_mouse_to_middle_of_browser(self.log, self.driver)
+        action_chains.drag_and_drop_by_offset(self.get_hotspot_from_center(), 5, 0).perform()
         time.sleep(1)
         self._add_info_data(title, name, url, "update")
 
@@ -424,6 +460,11 @@ class ConnectScenesTour(CommonAction):
         self.log.screenshot("Click on delete hotspot")
         self.btnDeleteHotSpot().click()
         time.sleep(1)
-        pyautogui.press('enter')
-        time.sleep(1)
+        alert = self.driver.switch_to.alert
+        alert.accept()
+        try:
+            self.get_hotspot_from_center()
+            raise Exception("Hotspot not deleted")
+        except Exception as ex:
+            pass
         self.log.screenshot("Hotspot is deleted")

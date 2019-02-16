@@ -1,18 +1,16 @@
 """
 Class for manipulating with page https://sgpano.com/upload-scenes/
 """
-
-import os
+import pyautogui
 import time
 
 import platform
-import pyautogui
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
+from pywinauto.application import Application
 
+
+from Lib.common.DriverData import DriverData
 from Lib.common.CommonAction import CommonAction
-from Lib.common.NonAppSpecific import get_images_path, check_if_elem_exist
+from Lib.common.NonAppSpecific import get_images_path, check_if_elem_exist, scroll_element_to_center
 from Lib.common.Log import Log
 from Lib.common.ScenesGetData import get_pictures_string
 from Lib.common.WaitAction import wait_until
@@ -96,24 +94,23 @@ class UploadScenesTour(CommonAction):
         self.log.info("Execute method upload_scenes with parameters scenes={}".format(scenes))
         imgs = get_images_path(scenes[0].folder)
         self.log.info("Scenes path is: {}".format(imgs))
+        scroll_element_to_center(self.driver, self.log, self.btnUpload())
         self.btnUpload().click()
-        time.sleep(4)
-        pyautogui.typewrite(imgs, 0.001)
-        time.sleep(2)
-        pyautogui.press("tab")
-        time.sleep(2)
-        pyautogui.press("tab")
-        time.sleep(2)
-        pyautogui.press("enter")
-        time.sleep(4)
-        pyautogui.typewrite(get_pictures_string(scenes))
+        time.sleep(3)
+        dialog_name = ""
+        if DriverData.driverName == "Firefox":
+            dialog_name = "File Upload"
+        elif DriverData.driverName == "Chrome":
+            dialog_name = "Open"
+        app = Application().connect(title=dialog_name)
+        app.Dialog.ComboBoxEx.Edit.type_keys(imgs)
+        self.log.screenshot("Entered path to images", True)
+        time.sleep(0.5)
+        app.dlg.Open.click()
+        app.Dialog.ComboBoxEx.Edit.type_keys(get_pictures_string(scenes))
+        time.sleep(0.5)
+        app.dlg.Open.click()
         self.log.screenshot("Entered all images", True)
-        time.sleep(2)
-        pyautogui.press("tab")
-        time.sleep(2)
-        pyautogui.press("tab")
-        time.sleep(2)
-        pyautogui.press("enter")
 
     def wait_scenes_uploaded(self, timeout):
         """
@@ -124,7 +121,6 @@ class UploadScenesTour(CommonAction):
         """
         self.log.info("Execute method wait_scenes_uploaded with parameters"
                       " timeout={}".format(timeout))
-        #wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("div[qq-drop-area-text='Drop files here']")), timeout)
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("h3[id='toplimit']")), timeout)
 
     def check_number_of_uploaded_scenes(self, numberBeforeUpload, numberToUpload):

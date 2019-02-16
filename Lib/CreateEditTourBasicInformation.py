@@ -5,8 +5,9 @@ Class for manipulating with page https://sgpano.com/create-new-virtual-tour/
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
-from Lib.common.NonAppSpecific import send_text
+from Lib.common.NonAppSpecific import send_text, check_if_elem_exist
 from Lib.common.Log import Log
+from Lib.common.WaitAction import wait_until
 
 
 class BasicInformationTour:
@@ -62,6 +63,7 @@ class BasicInformationTour:
                       " watermark={}, publicAccess={}, mode={}".format(title, address, description, watermark,
                                                                        publicAccess, mode))
         if title:
+            wait_until(lambda: check_if_elem_exist(self.inpTitle), timeout=30)
             send_text(self.inpTitle(), title, mode=mode)
         if address:
             send_text(self.inpAddress(), address, mode=mode)
@@ -75,7 +77,7 @@ class BasicInformationTour:
             send_text(self.txtDescription(), description, mode=mode)
         self.log.screenshot("Data entered. Click on button submit")
         self.btnSubmit().click()
-        wait = WebDriverWait(self.driver, 30)
+        wait = WebDriverWait(self.driver, 60)
         wait.until(expected_conditions.visibility_of_element_located(
             (By.CSS_SELECTOR, "div[class*='qq-upload-button']")))
         self.log.info("Submit done")

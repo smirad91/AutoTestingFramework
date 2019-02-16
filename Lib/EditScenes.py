@@ -3,6 +3,8 @@ Class for manipulating with page https://sgpano.com/edit-scenes/
 """
 
 import time
+
+from Lib.common import DriverData
 from Lib.common.Log import Log
 from Lib.common.WaitAction import wait_until
 
@@ -77,18 +79,21 @@ class EditScenes:
         :type name: str
         """
         self.log.info("Execute method view_tour_by_name with parameter name={}".format(name))
-        tab_number_before = len(self.driver.window_handles)
-        self.log.info("Number of tabs currently open={}".format(tab_number_before))
         scene = self.find_scene_by_name(name)
-        if scene:
-            scene.find_element_by_css_selector("a[title='View']").click()
-        self.log.info("Check if view is opened in new tab")
-        wait_until(lambda: len(self.driver.window_handles) == tab_number_before+1, 30)
-        self.log.info("View is opened in new tab")
-        self.driver.switch_to.window(self.driver.window_handles[1])
-        wait_until(lambda: name in self.driver.title, timeout=30,
-                   errorMessage="Wrong tour is opened= {}. Tour= {} should be opened".format(self.driver.title, name))
-
+        if DriverData.DriverData.mobile:
+            link = scene.find_element_by_css_selector("a[title='View']").get_attribute("href")
+            self.driver.get(link)
+        else:
+            tab_number_before = len(self.driver.window_handles)
+            self.log.info("Number of tabs currently open={}".format(tab_number_before))
+            if scene:
+                scene.find_element_by_css_selector("a[title='View']").click()
+            self.log.info("Check if view is opened in new tab")
+            wait_until(lambda: len(self.driver.window_handles) == tab_number_before+1, 30)
+            self.log.info("View is opened in new tab")
+            self.driver.switch_to.window(self.driver.window_handles[1])
+            wait_until(lambda: name in self.driver.title, timeout=30,
+                       errorMessage="Wrong tour is opened= {}. Tour= {} should be opened".format(self.driver.title, name))
 
     def edit_tour(self, name):
         """

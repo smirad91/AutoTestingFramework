@@ -68,6 +68,10 @@ class UploadedScenesTour(CommonAction):
                 self.log.info("Delete scene with title={}".format(title))
                 scene.find_element_by_css_selector("div[class='icon-delete']").click()
                 self.btnDeleteSceneOk().click()
+                try:
+                    wait_until(lambda: not check_if_elem_exist(self.btnDeleteSceneOk), timeout=10)
+                except Exception as ex:
+                    self.btnDeleteSceneOk().click()
                 wait_until(lambda: numberOfScenesBeforeDelete - 1 == len(self.get_uploaded_scenes()), 30)
                 wait_until(lambda: check_if_elem_exist(UploadScenesTour(self.driver).btnUpload), timeout=30, period=2)
                 self.log.screenshot("Scene {} deleted".format(title))

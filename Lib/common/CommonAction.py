@@ -2,7 +2,6 @@
     Example shown in file CreateEditTourConnectScenes.py"""
 import time
 import pyautogui
-from selenium import webdriver
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.common.keys import Keys
 
@@ -30,7 +29,7 @@ class CommonAction:
         return self.driver.find_element_by_css_selector("ul[class='sh-nav-mobile']").find_element_by_css_selector(
             "a[href*='membership-levels']")
 
-    def click_on_element(self, element):
+    def click_on_element(self, func):
         """
         Try to click on element. If another element is on top of this element (ElementClickInterceptedException)
         then scroll_to_element is executed and try to click again
@@ -39,14 +38,15 @@ class CommonAction:
         :type element: WebElement
         """
         try:
-            element.click()
+            scroll_element_to_center(self.driver, self.log, func())
+            func().click()
         except ElementClickInterceptedException as ex:
-            scroll_to_element(self.log, self.driver, element)
             time.sleep(1)
             #scroll because of sticky-header that is on top of site when we scroll down
-            self.driver.find_element_by_tag_name("html").send_keys(Keys.ARROW_UP * 2)
+            pyautogui.press(Keys.ARROW_UP)
+            pyautogui.press(Keys.ARROW_UP)
             time.sleep(1)
-            element.click()
+            func().click()
 
     def move_mouse_to_middle_of_element(self, element):
         """
@@ -88,37 +88,19 @@ def get_hotSpots(log, driver):
     return allHotSpots
 
 
-def get_client_height():
-    if DriverData.fullHeight is None:
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--disable-infobars")
-        driver2 = webdriver.Chrome(chrome_options=chrome_options)
-        driver2.maximize_window()
-        time.sleep(2)
-        clientHeight = driver2.get_window_size()["height"] - int(
-            driver2.find_element_by_tag_name("html").get_attribute("clientHeight"))
-        DriverData.fullHeight = clientHeight
-        driver2.close()
-    else:
-        return DriverData.fullHeight
-    return clientHeight
-
-
-def move_mouse_to_element(driver, element):
+def move_mouse_to_element(driver, log, element):
     """
     Move mouse with pyautogui library to element
 
     :param driver:
     :param element:
     """
-    scroll_element_to_center(driver, element)
+    scroll_element_to_center(driver, log, element)
     hiddenPixels = driver.execute_script("return window.pageYOffset")
 
-    clientHeight = get_client_height()
-
-    time.sleep(1)
+    tabHeight = DriverData.tabHeight
     size = element.size
-    y = element.location["y"] + size["height"]/2 - hiddenPixels + clientHeight
+    y = element.location["y"] + size["height"]/2 - hiddenPixels + tabHeight
     x = element.location["x"] + size["width"]/2
     pyautogui.moveTo(x, y, duration=1)
     time.sleep(1)

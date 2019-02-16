@@ -3,7 +3,12 @@ Class for manipulating with page https://sgpano.com/virtual-tour-singapore-dashb
 """
 
 import time
+
+from Lib.CreateEditTourBasicInformation import BasicInformationTour
 from Lib.common.Log import Log
+from Lib.common.NonAppSpecific import check_if_elem_exist, scroll_to_element, scroll_element_to_center
+from Lib.common.WaitAction import wait_until
+
 
 class Dashboard:
 
@@ -25,9 +30,12 @@ class Dashboard:
         Click on create new tour
         """
         self.log.info("Execute method create_new_tour")
+        wait_until(lambda: check_if_elem_exist(self.btnCreateNewTour), timeout=30)
+        scroll_element_to_center(self.driver, self.log, self.btnCreateNewTour())
         self.btnCreateNewTour().click()
         self.log.info("Create new tour button clicked")
-        time.sleep(2)
+        wait_until(lambda: check_if_elem_exist(BasicInformationTour(self.driver).inpTitle),
+                   timeout=30, errorMessage="Create new tour not opened")
 
     def view_edit_tour(self):
         """

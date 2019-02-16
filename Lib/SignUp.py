@@ -166,7 +166,7 @@ class SignUp:
         wait_until(lambda: click_on_element_intercepted(self.btnContinuePayPal), timeout=timeout)
         wait_until(lambda: check_if_elem_exist(self.btnPayNow), timeout=timeout)
         self.log.screenshot("Click on pay now")
-        #self.btnPayNow().click()
+        self.btnPayNow().click()
         time.sleep(15)
         self.log.screenshot("Paid")
 
