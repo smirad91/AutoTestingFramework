@@ -3,8 +3,9 @@ Class used for holding information about browser to test, device to test, orient
 """
 import json
 import os
+import platform
 import time
-from ctypes import windll
+
 
 import pyautogui
 from selenium import webdriver
@@ -44,8 +45,10 @@ class DriverData:
         :param orientation: Used only if mobileToTest is forwarded. Possible values: Portrait and Landscape
         :type orientation: str
         """
-        if windll.user32.BlockInput(True) == 0:
-           raise Exception("Not running script as admin")
+        if platform.system() in "Windows":
+            from ctypes import windll
+            if windll.user32.BlockInput(True) == 0:
+               raise Exception("Not running script as admin")
         if is_forwarded("browser") is not None:
             driver = is_forwarded("browser")
         DriverData.driverName = driver
@@ -86,6 +89,8 @@ class DriverData:
             driver = self.create_firefox_driver(mobileToTest, orientation)
         elif driverString == "Chrome":
             driver = self.create_chrome_driver(mobileToTest, orientation)
+        elif driverString == "Safari":
+            driver = self.create_safari_driver(mobileToTest, orientation)
         else:
             raise Exception("Supported drivers are Firefox and Chrome. You forwarded {}".format(driverString))
         return driver
@@ -118,6 +123,22 @@ class DriverData:
             driver = self.create_chrome_driver_mobile(mobileToTest, orientation)
         else:
             driver = self.create_chrome_driver_desktop()
+        return driver
+
+    def create_safari_driver(self, mobileToTest, orientation):
+        driver = webdriver.Safari()
+        if mobileToTest is not None:
+            size = get_mobile_size(mobileToTest, orientation)
+            DriverData.mobileHeight = size["height"]
+            DriverData.mobileWidth = size["width"]
+            driver.set_window_size(size["width"], size["height"])
+            #set_height_width(driver)
+            #set_firefox_mobile_size(driver, size["width"], size["height"])
+            #self.set_browser_tab_section_height_mobile()
+        else:
+            driver.maximize_window()
+            #self.get_set_browser_tab_section_height(driver)
+            #set_height_width(driver)
         return driver
 
     def close(self):
