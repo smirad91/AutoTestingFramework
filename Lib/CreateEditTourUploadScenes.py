@@ -5,7 +5,7 @@ import pyautogui
 import time
 
 import platform
-from pywinauto.application import Application
+
 
 
 from Lib.common.DriverData import DriverData
@@ -91,6 +91,8 @@ class UploadScenesTour(CommonAction):
         :param scenes: List of scenes
         :type scenes: list[Scene]
         """
+        from pywinauto.application import Application
+
         self.log.info("Execute method upload_scenes with parameters scenes={}".format(scenes))
         imgs = get_images_path(scenes[0].folder)
         self.log.info("Scenes path is: {}".format(imgs))

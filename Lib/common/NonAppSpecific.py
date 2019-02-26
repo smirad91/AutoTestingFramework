@@ -38,6 +38,17 @@ def get_images_path(folderName):
         os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, 'Images', folderName))
     return path
 
+def get_location(driver, element):
+    # if "safari" in inspect.getfile(driver.__class__):
+    #     location = driver.execute_script("return arguments[0].getBoundingClientRect()", element)
+    # else:
+    #     location = element.location
+    before =  driver.execute_script("return window.pageYOffset")
+    driver.execute_script("scroll(0,0)")
+    location = driver.execute_script("return arguments[0].getBoundingClientRect()", element)
+    driver.execute_script("scroll(0,{})".format(before))
+    return location
+
 
 def check_if_elem_exist(func):
     """
@@ -79,7 +90,7 @@ def scroll_to_element(log, driver, element):
     :type element: WebElement
     """
     log.info("Execute method scroll_to_element")
-    driver.execute_script("scroll(0,{})".format(element.location["y"]))
+    driver.execute_script("scroll(0,{})".format(get_location(driver, element)["y"]))
 
 
 def scroll_down_by(log, driver, pixels):
@@ -128,7 +139,7 @@ def scroll_element_to_center(driver, log, element):
     :type element: WebElement
     """
     size = element.size
-    location = element.location
+    location = get_location(driver, element)
     viewPointHeight = driver.execute_script("return window.innerHeight")
     if viewPointHeight > size["height"]:
         pom = (viewPointHeight-size["height"])/2
@@ -146,7 +157,7 @@ def scroll_element_to_viewPoint_with_selenium(driver, element):
     :param element: Element to scroll on center
     :type element: WebElement
     """
-    location = element.location
+    location = get_location(driver, element)
     driver.execute_script("scroll(0,{})".format(location["y"]))
 
 
@@ -167,10 +178,10 @@ def scroll_element_to_center_with_drag(driver, actionChains, fromElement, toElem
     :type element: WebElement
     """
     fromSize = fromElement.size
-    fromLocation = fromElement.location
+    fromLocation = get_location(driver, fromElement)
 
     toSize = toElement.size
-    toLocation = toElement.location
+    toLocation = get_location(driver, toElement)
     viewPointHeight = int(driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
     moveBy = int(viewPointHeight / 2)
     i = 1
@@ -178,7 +189,7 @@ def scroll_element_to_center_with_drag(driver, actionChains, fromElement, toElem
         #down
         onViewPoint = False
         while not onViewPoint:
-            if not is_location_on_viewpoint(driver, toElement.location["y"]+int(toSize["height"]/2)):
+            if not is_location_on_viewpoint(driver, get_location(driver, toElement)["y"]+int(toSize["height"]/2)):
                 if i ==1:
                     actionChains.move_by_offset(0, moveBy).perform()
                 else:

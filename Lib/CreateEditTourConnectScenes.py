@@ -10,7 +10,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from Lib.common.CommonAction import CommonAction, get_hotSpots, move_mouse_to_element
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import scroll_element_to_center, check_if_elem_exist, send_text, \
-    scroll_element_to_center_with_drag, scroll_element_to_viewPoint_with_selenium
+    scroll_element_to_center_with_drag, scroll_element_to_viewPoint_with_selenium, get_location
 from Lib.common.DriverData import move_mouse_to_middle_of_browser, DriverData
 from Lib.common.WaitAction import wait_until
 
@@ -221,6 +221,7 @@ class ConnectScenesTour(CommonAction):
         :param clickNumber: Number of times to click on arrow
         :type clickNumber: int
         """
+        time.sleep(2)
         self.log.info("Execute method rotate with parameters right={}, clickNumber={}".format(right, clickNumber))
         if clickNumber != 0:
             if right:
@@ -286,6 +287,7 @@ class ConnectScenesTour(CommonAction):
         :type title: str
         """
         self.log.info("Execute method change_current_scene with title={}".format(title))
+        self.wait_scene_load()
         self.driver.find_element_by_xpath("//h5[contains(text(),'{}')]".format(title)).click()
         self.wait_scene_load()
         scroll_element_to_center(self.driver, self.log, self.tourImage())
@@ -304,7 +306,8 @@ class ConnectScenesTour(CommonAction):
         Click on button panToView
         """
         self.log.info("Execute method pan_to_view")
-        self.click_on_element(self.btnPanToView)
+        self.driver.execute_script("arguments[0].click();", self.btnPanToView())
+        #self.click_on_element(self.btnPanToView)
         time.sleep(3)
 
     def insert_hotSpots(self, scenes):
@@ -330,7 +333,35 @@ class ConnectScenesTour(CommonAction):
         elif DriverData.driverName == "Chrome":
             self._add_button_to_center_pyautogui(hotSpot)
         else:
-            pass
+            self._add_button_to_center_safari(hotSpot)
+
+    def _add_button_to_center_safari(self, hotSpot):
+        time.sleep(3)
+        self.log.info("Execute method _add_button_to_center")
+        if hotSpot:
+            button = self.btnHotSpot
+        else:
+            button = self.btnInfo
+        scroll_element_to_center(self.driver, self.log, self.btnHotSpot())
+        fromLocation = get_location(self.driver, self.btnHotSpot())
+        toLocation = get_location(self.driver, self.tourImage())
+
+        dole = self.driver.execute_script("return window.pageYOffset") + int(
+            self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
+
+        wantedX = toLocation["x"] + int(self.tourImage().size["width"] / 2)
+        wantedY = toLocation["y"] + int(self.tourImage().size["height"] / 2)
+
+        currentX = fromLocation["x"] + int(button().size["width"]/2) + 50+10-10
+        currentY = fromLocation["y"] + int(button().size["height"]/2) + dole
+        x = wantedX - currentX
+        y = wantedY - currentY
+
+        ActionChains(self.driver).move_to_element(self.btnHotSpot()).click_and_hold().move_by_offset(50,
+                                                                                                     dole).move_by_offset(
+            10, 0).move_by_offset(-10, 0).move_by_offset(x, y).click(self.btnHotSpot()).release().perform()
+
+        time.sleep(2)
 
     def delete_hotSpot(self, scene, hotSpotLocation):
         """

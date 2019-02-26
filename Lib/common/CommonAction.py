@@ -6,7 +6,7 @@ from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.common.keys import Keys
 
 from Lib.common.DriverData import DriverData
-from Lib.common.NonAppSpecific import scroll_to_element, scroll_up_by, scroll_element_to_center
+from Lib.common.NonAppSpecific import scroll_to_element, scroll_up_by, scroll_element_to_center, get_location
 
 
 class CommonAction:
@@ -58,7 +58,7 @@ class CommonAction:
         fullBrowserSize = self.driver.get_window_size()
         fullbrowserVisina = fullBrowserSize["height"]
         unutrasnjiDeoVisina = int(self.driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
-        lokacijaElementa = element.location["y"]
+        lokacijaElementa = get_location(self.driver, element)["y"]
         self.driver.execute_script("scroll(0,{})".format(
                 fullbrowserVisina - unutrasnjiDeoVisina + lokacijaElementa))
         addSticky = False
@@ -72,7 +72,7 @@ class CommonAction:
             pass
         time.sleep(1)
         el3 = self.driver.find_element_by_css_selector("img[class='sh-image-url']")
-        pyautogui.moveTo(el3.location["x"], el3.location["y"])
+        pyautogui.moveTo(get_location(self.driver, el3)["x"], get_location(self.driver, el3)["y"])
 
 
 def get_hotSpots(log, driver):
@@ -100,7 +100,7 @@ def move_mouse_to_element(driver, log, element):
 
     tabHeight = DriverData.tabHeight
     size = element.size
-    y = element.location["y"] + size["height"]/2 - hiddenPixels + tabHeight
-    x = element.location["x"] + size["width"]/2
+    y = get_location(driver, element)["y"] + size["height"]/2 - hiddenPixels + tabHeight
+    x = get_location(driver, element)["x"] + size["width"]/2
     pyautogui.moveTo(x, y, duration=1)
     time.sleep(1)

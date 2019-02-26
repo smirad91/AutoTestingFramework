@@ -17,10 +17,12 @@ class Dashboard:
         self.log = Log(driver)
 
     def btnCreateNewTour(self):
-        return self.driver.find_element_by_css_selector("a[href*='create-new-virtual-tour']")
+        #return self.driver.find_element_by_css_selector("a[href*='create-new-virtual-tour']")
+        return self.driver.find_element_by_css_selector("img[src*='create1']")
 
-    def btnViewEditToure(self):
-        return self.driver.find_element_by_css_selector("a[href*='edit-scenes']")
+    def btnViewEditTour(self):
+        #return self.driver.find_element_by_css_selector("a[href*='edit-scenes']")
+        return self.driver.find_element_by_css_selector("img[src*='edittour1']")
 
     def btnEditProfile(self):
         return self.driver.find_element_by_css_selector("img[src*='editprofile1']")
@@ -42,7 +44,7 @@ class Dashboard:
         Click on view edit tour
         """
         self.log.info("Go to view/edit tour")
-        self.btnViewEditToure().click()
+        self.btnViewEditTour().click()
         time.sleep(2)
 
     def go_to_edit_profile(self):

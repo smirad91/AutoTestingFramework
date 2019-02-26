@@ -105,6 +105,7 @@ class EditScenes:
         self.log.info("Execute method edit_tour with parameter name={}".format(name))
         scene = self.find_scene_by_name(name)
         if scene:
-            scene.find_element_by_css_selector("a[title='Edit']").click()
+            #scene.find_element_by_css_selector("a[title='Edit']").click()
+            scene.find_element_by_css_selector("a[title='Edit']").find_element_by_tag_name("i").click()
             time.sleep(2)
             self.log.info("Scene found and clicked on edit button")
