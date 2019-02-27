@@ -42,6 +42,7 @@ class EditScenes:
         :return: Tour
         :rtype: WebElement
         """
+        time.sleep(2)
         self.log.info("Execute method find_scene_by_name with parameter name={}".format(name))
         sceneFound = False
         allScenes = self.divScenes()

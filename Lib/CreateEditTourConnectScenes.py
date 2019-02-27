@@ -221,7 +221,7 @@ class ConnectScenesTour(CommonAction):
         :param clickNumber: Number of times to click on arrow
         :type clickNumber: int
         """
-        time.sleep(2)
+        time.sleep(4)
         self.log.info("Execute method rotate with parameters right={}, clickNumber={}".format(right, clickNumber))
         if clickNumber != 0:
             if right:
@@ -332,7 +332,7 @@ class ConnectScenesTour(CommonAction):
             self._add_button_to_center_with_selenium(hotSpot)
         elif DriverData.driverName == "Chrome":
             self._add_button_to_center_pyautogui(hotSpot)
-        else:
+        elif DriverData.driverName == "Safari":
             self._add_button_to_center_safari(hotSpot)
 
     def _add_button_to_center_safari(self, hotSpot):
@@ -351,28 +351,96 @@ class ConnectScenesTour(CommonAction):
         scrollToBottom = self.driver.execute_script("return window.pageYOffset") + int(
             self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
 
-        wantedX = toLocation["x"] + int(self.tourImage().size["width"] / 2)
-        wantedY = toLocation["y"] + int(self.tourImage().size["height"] / 2)
-
-        currentX = fromLocation["x"] + int(button().size["width"]/2) + 50+10-10
-        currentY = fromLocation["y"] + int(button().size["height"]/2) + scrollToBottom + 40
-        x = wantedX - currentX
-        y = wantedY - currentY
-        print("x: {}".format(x))
-        print("y: {}".format(y))
-        time.sleep(1)
-
         moveFor = toLocation["y"] + self.tourImage().size["height"] / 2 - (
                     self.driver.execute_script("return window.pageYOffset") + int(
                 self.driver.execute_script("return window.innerHeight"))) + int(
             self.driver.execute_script("return window.innerHeight") / 2)
         print("moveFor {}".format(moveFor))
-
         numberOfMoves = int(moveFor / oneScrollPixels)
+
+        wantedX = toLocation["x"] + int(self.tourImage().size["width"] / 2)
+        wantedY = toLocation["y"] + int(self.tourImage().size["height"] / 2)
+
+        currentX = fromLocation["x"] + int(button().size["width"] / 2) + 10 - 10
+        currentY = fromLocation["y"] + int(
+            button().size["height"] / 2) + scrollToBottom + oneScrollPixels * numberOfMoves
+        x = wantedX - currentX
+        y = wantedY - currentY
+        print("x: {}".format(x))
+        print("y: {}".format(y))
+        time.sleep(1)
         print("numberOfmoves {}".format(numberOfMoves))
         print("scroll to bottom {}".format(scrollToBottom))
-        ActionChains(self.driver).move_to_element(self.btnHotSpot()).click_and_hold().move_by_offset(0, scrollToBottom)\
-            .move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(x, y).click(self.btnHotSpot()).release().perform()
+        ac = ActionChains(self.driver)
+        ac.move_to_element(self.btnHotSpot()).click_and_hold()#.move_by_offset(0, scrollToBottom)
+        # ac.move_by_offset(0, scrollToBottom)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0)
+
+        # ac.move_by_offset(0, scrollToBottom) # ovo radi
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10,0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10,0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+
+        #self.test(ac, scrollToBottom)
+        self.dragwithhotspot(ac, scrollToBottom, numberOfMoves)
+
+        # moveToSide = 10
+        # for i in range(numberOfMoves - 1):
+        #     ac.move_by_offset(moveToSide, 0)
+        #     moveToSide *= -1
+        ac.move_by_offset(x, y).click(self.btnHotSpot()).release().perform()
+
+    def test(self, act, scrollToBottom):
+        #act.move_by_offset(0, scrollToBottom)
+        moveToSide = 10
+        for i in range(16):
+            act.move_by_offset(moveToSide,0)
+            moveToSide *= -1
+        return moveToSide
+        # ac.move_by_offset(0, scrollToBottom) # radi
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+        # ac.move_by_offset(10, 0)
+        # ac.move_by_offset(-10, 0)
+
+
+    def dragwithhotspot(self, actionChains, scrollToBottom, numberOfMoves):
+        #fullMoveToSide = 0
+        moveToSide = 10
+        actionChains.move_by_offset(0, scrollToBottom)
+        for i in range(numberOfMoves):#numberOfMoves-1):
+            actionChains.move_by_offset(moveToSide, 0)
+      #      fullMoveToSide += moveToSide
+            moveToSide *= -1
+    #    print("move side {}".format(fullMoveToSide))
+     #   return fullMoveToSide
+
 
 
     def _get_hotSpot_scroll_pixels(self, hotSpot):
