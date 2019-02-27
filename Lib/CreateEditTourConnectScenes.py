@@ -10,7 +10,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from Lib.common.CommonAction import CommonAction, get_hotSpots, move_mouse_to_element
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import scroll_element_to_center, check_if_elem_exist, send_text, \
-    scroll_element_to_center_with_drag, scroll_element_to_viewPoint_with_selenium, get_location
+    scroll_element_to_center_with_drag, scroll_element_to_viewPoint_with_selenium, get_location, get_hidden_pixels
 from Lib.common.DriverData import move_mouse_to_middle_of_browser, DriverData
 from Lib.common.WaitAction import wait_until
 
@@ -342,26 +342,69 @@ class ConnectScenesTour(CommonAction):
             button = self.btnHotSpot
         else:
             button = self.btnInfo
+        oneScrollPixels = self._get_hotSpot_scroll_pixels(hotSpot)
+
         scroll_element_to_center(self.driver, self.log, self.btnHotSpot())
         fromLocation = get_location(self.driver, self.btnHotSpot())
         toLocation = get_location(self.driver, self.tourImage())
 
-        dole = self.driver.execute_script("return window.pageYOffset") + int(
+        scrollToBottom = self.driver.execute_script("return window.pageYOffset") + int(
             self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
 
         wantedX = toLocation["x"] + int(self.tourImage().size["width"] / 2)
         wantedY = toLocation["y"] + int(self.tourImage().size["height"] / 2)
 
         currentX = fromLocation["x"] + int(button().size["width"]/2) + 50+10-10
-        currentY = fromLocation["y"] + int(button().size["height"]/2) + dole
+        currentY = fromLocation["y"] + int(button().size["height"]/2) + scrollToBottom + 40
         x = wantedX - currentX
         y = wantedY - currentY
+        print("x: {}".format(x))
+        print("y: {}".format(y))
+        time.sleep(1)
 
-        ActionChains(self.driver).move_to_element(self.btnHotSpot()).click_and_hold().move_by_offset(50,
-                                                                                                     dole).move_by_offset(
-            10, 0).move_by_offset(-10, 0).move_by_offset(x, y).click(self.btnHotSpot()).release().perform()
+        moveFor = toLocation["y"] + self.tourImage().size["height"] / 2 - (
+                    self.driver.execute_script("return window.pageYOffset") + int(
+                self.driver.execute_script("return window.innerHeight"))) + int(
+            self.driver.execute_script("return window.innerHeight") / 2)
+        print("moveFor {}".format(moveFor))
 
-        time.sleep(2)
+        numberOfMoves = int(moveFor / oneScrollPixels)
+        print("numberOfmoves {}".format(numberOfMoves))
+        print("scroll to bottom {}".format(scrollToBottom))
+        ActionChains(self.driver).move_to_element(self.btnHotSpot()).click_and_hold().move_by_offset(0, scrollToBottom)\
+            .move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(x, y).click(self.btnHotSpot()).release().perform()
+
+
+    def _get_hotSpot_scroll_pixels(self, hotSpot):
+        if hotSpot:
+            element = self.btnHotSpot()
+        else:
+            element = self.btnInfo()
+        startHidenPixels = get_hidden_pixels(self.driver)
+        scroll_element_to_center(self.driver, self.log, element)
+        action_chains = ActionChains(self.driver)
+        hiddenPixels = get_hidden_pixels(self.driver)
+        fromLocation = get_location(self.driver, element)
+
+        action_chains.move_to_element(element)
+        action_chains.click_and_hold()
+        scrollFor = self.driver.execute_script("return window.pageYOffset") + int(
+            self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
+        print(scrollFor)
+        print(type(scrollFor))
+        action_chains.move_by_offset(0, scrollFor)
+        #action_chains.move_by_offset(10, 0)
+
+        # action_chains.move_by_offset(10, 0)
+        # action_chains.move_by_offset(-10, 0)
+        action_chains.move_by_offset(0, -scrollFor)
+        action_chains.release()
+        action_chains.perform()
+        hiddenPixelsAfter = get_hidden_pixels(self.driver)
+        scrolledPixels = hiddenPixelsAfter - hiddenPixels
+        print("pixels {}".format(scrolledPixels))
+        self.driver.execute_script("scroll(0,{})".format(startHidenPixels))
+        return scrolledPixels
 
     def delete_hotSpot(self, scene, hotSpotLocation):
         """

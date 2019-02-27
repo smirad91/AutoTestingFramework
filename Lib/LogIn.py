@@ -45,6 +45,8 @@ class LogIn:
         :param password:
         """
         self.log.info("Execute method log_in with parameters: {}, {}".format(username, password))
+        wait_until(lambda: check_if_elem_exist(self.inpUsername), timeout=20)
+        wait_until(lambda: self.inpUsername().is_displayed, timeout=20)
         self.inpUsername().send_keys(username)
         self.inpPassword().send_keys(password)
         self.log.info("Click on log in button")

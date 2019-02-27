@@ -163,12 +163,16 @@ def scroll_element_to_viewPoint_with_selenium(driver, element):
 
 def is_location_on_viewpoint(driver, locationY):
     hiddenPixels = driver.execute_script("return window.pageYOffset")
-    viewPointHeight = int(driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
+    # viewPointHeight = int(driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
+    # viewPointHeight = DriverData.DriverData.mobileHeight
+    viewPointHeight = driver.execute_script("return window.innerHeight")
     if locationY < hiddenPixels + viewPointHeight and locationY > hiddenPixels:
         return True
     else:
         return False
 
+def get_hidden_pixels(driver):
+    return driver.execute_script("return window.pageYOffset")
 
 def scroll_element_to_center_with_drag(driver, actionChains, fromElement, toElement):
     """
