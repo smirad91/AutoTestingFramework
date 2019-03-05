@@ -88,13 +88,18 @@ class EditScenes:
             tab_number_before = len(self.driver.window_handles)
             self.log.info("Number of tabs currently open={}".format(tab_number_before))
             if scene:
-                scene.find_element_by_css_selector("a[title='View']").click()
+                scene.find_element_by_css_selector("a[title='View']").find_element_by_tag_name("i").click()
             self.log.info("Check if view is opened in new tab")
             wait_until(lambda: len(self.driver.window_handles) == tab_number_before+1, 30)
             self.log.info("View is opened in new tab")
-            self.driver.switch_to.window(self.driver.window_handles[1])
-            wait_until(lambda: name in self.driver.title, timeout=30,
-                       errorMessage="Wrong tour is opened= {}. Tour= {} should be opened".format(self.driver.title, name))
+            for handle in self.driver.window_handles:
+                self.driver.switch_to.window(handle)
+                try:
+                    wait_until(lambda: name in self.driver.title, timeout=30,
+                           errorMessage="Wrong tour is opened= {}. Tour= {} should be opened".format(self.driver.title, name))
+                except:
+                    pass
+                break
 
     def edit_tour(self, name):
         """

@@ -82,7 +82,7 @@ class ConnectScenesTour(CommonAction):
         return self.driver.find_element_by_css_selector("input[value='Publish']")
 
     def btnChangeTheme(self):
-        return self.driver.find_element_by_css_selector("a[class='button-changetheme']")
+        return self.driver.find_element_by_css_selector("a[class='button-changetheme']").find_element_by_tag_name("img")
 
     def imgThemeToSelect(self, number):
         return self.driver.find_elements_by_css_selector("div[class*='thumbnail']")[number-1]
@@ -113,6 +113,7 @@ class ConnectScenesTour(CommonAction):
         :type number: int [1..4]
         """
         self.log.info("Execute method choose_theme with parameter number={}".format(number))
+        wait_until(lambda: check_if_elem_exist(self.btnChangeTheme), timeout=10)
         scroll_element_to_center(self.driver, self.log, self.btnChangeTheme())
         time.sleep(3)
         self.btnChangeTheme().click()
@@ -123,7 +124,7 @@ class ConnectScenesTour(CommonAction):
         wait_until(lambda: "selected" in self.imgThemeToSelect(number).get_attribute("class"), timeout=5)
         self.log.screenshot("Theme is selected")
         self.btnSelectTheme().click()
-        wait_until(lambda: self.btnChangeTheme().find_element_by_tag_name("img").get_attribute("src") == themeSrc, timeout=20)
+        wait_until(lambda: self.btnChangeTheme().get_attribute("src") == themeSrc, timeout=20)
         self.log.screenshot("Theme is updated")
 
 

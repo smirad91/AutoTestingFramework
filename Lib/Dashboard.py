@@ -34,6 +34,7 @@ class Dashboard:
         self.log.info("Execute method create_new_tour")
         wait_until(lambda: check_if_elem_exist(self.btnCreateNewTour), timeout=30)
         scroll_element_to_center(self.driver, self.log, self.btnCreateNewTour())
+        time.sleep(5)
         self.btnCreateNewTour().click()
         self.log.info("Create new tour button clicked")
         wait_until(lambda: check_if_elem_exist(BasicInformationTour(self.driver).inpTitle),
@@ -44,6 +45,7 @@ class Dashboard:
         Click on view edit tour
         """
         self.log.info("Go to view/edit tour")
+        time.sleep(3)
         self.btnViewEditTour().click()
         time.sleep(2)
 
