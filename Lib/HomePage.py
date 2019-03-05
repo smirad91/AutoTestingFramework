@@ -5,7 +5,7 @@ import time
 
 from Lib.common.CommonAction import CommonAction
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import check_if_elem_exist
+from Lib.common.NonAppSpecific import check_if_elem_exist, scroll_element_to_center
 from Lib.common.WaitAction import wait_until
 
 
@@ -32,8 +32,10 @@ class HomePage(CommonAction):
         """
         self.log.info("Go to log in page")
         if not self.btnLogIn().is_displayed():
+            time.sleep(2)
             self.btnOpenMenu().click()
             wait_until(lambda: check_if_elem_exist(self.btnLogInMobile), timeout=20)
+            scroll_element_to_center(self.driver, self.log, self.btnLogInMobile())
             self.btnLogInMobile().click()
         else:
             self.btnLogIn().click()

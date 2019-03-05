@@ -5,6 +5,8 @@ Class for manipulating with page https://sgpano.com/connect-scenes/
 import pyautogui
 from selenium.webdriver import ActionChains
 import time
+
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from Lib.common.CommonAction import CommonAction, get_hotSpots, move_mouse_to_element
@@ -372,75 +374,22 @@ class ConnectScenesTour(CommonAction):
         print("numberOfmoves {}".format(numberOfMoves))
         print("scroll to bottom {}".format(scrollToBottom))
         ac = ActionChains(self.driver)
-        ac.move_to_element(self.btnHotSpot()).click_and_hold()#.move_by_offset(0, scrollToBottom)
-        # ac.move_by_offset(0, scrollToBottom)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0).move_by_offset(10, 0).move_by_offset(-10, 0)
+        ac.move_to_element(self.btnHotSpot()).click_and_hold()
 
-        # ac.move_by_offset(0, scrollToBottom) # ovo radi
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10,0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10,0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
+        self.drag_with_hotspot(ac, scrollToBottom, numberOfMoves, x, y)
 
-        #self.test(ac, scrollToBottom)
-        self.dragwithhotspot(ac, scrollToBottom, numberOfMoves)
+        ActionChains(self.driver).release().perform()
 
-        # moveToSide = 10
-        # for i in range(numberOfMoves - 1):
-        #     ac.move_by_offset(moveToSide, 0)
-        #     moveToSide *= -1
-        ac.move_by_offset(x, y).click(self.btnHotSpot()).release().perform()
 
-    def test(self, act, scrollToBottom):
-        #act.move_by_offset(0, scrollToBottom)
+    def drag_with_hotspot(self, act, scrollToBottom, numberOfMoves, x, y):
+        act.move_by_offset(0, scrollToBottom)
         moveToSide = 10
-        for i in range(16):
+        for i in range(numberOfMoves):
             act.move_by_offset(moveToSide,0)
             moveToSide *= -1
+        act.move_by_offset(x,y)
+        act.perform()
         return moveToSide
-        # ac.move_by_offset(0, scrollToBottom) # radi
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-        # ac.move_by_offset(10, 0)
-        # ac.move_by_offset(-10, 0)
-
-
-    def dragwithhotspot(self, actionChains, scrollToBottom, numberOfMoves):
-        #fullMoveToSide = 0
-        moveToSide = 10
-        actionChains.move_by_offset(0, scrollToBottom)
-        for i in range(numberOfMoves):#numberOfMoves-1):
-            actionChains.move_by_offset(moveToSide, 0)
-      #      fullMoveToSide += moveToSide
-            moveToSide *= -1
-    #    print("move side {}".format(fullMoveToSide))
-     #   return fullMoveToSide
-
 
 
     def _get_hotSpot_scroll_pixels(self, hotSpot):
@@ -497,8 +446,14 @@ class ConnectScenesTour(CommonAction):
         :type title: str
         """
         self.log.info("Execute method _set_hotSpot_goingTo with parameter={}".format(title))
-        self.driver.find_element_by_xpath("//select[@id='select-hotSpots']/option[text()='{}']"
-                                          .format(title)).click()
+        options = self.driver.find_element_by_xpath("//select[@id='select-hotSpots']")
+        goingTo = self.driver.find_element_by_xpath("//select[@id='select-hotSpots']/option[text()='{}']"
+                                          .format(title))
+        scroll_element_to_center(self.driver, self.log, options)
+        options.click()
+        time.sleep(2)
+        goingTo.click()
+        time.sleep(2)
 
 
     def open_menu_hotSpotOrInfo_center(self):
