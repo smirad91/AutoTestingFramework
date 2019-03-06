@@ -489,8 +489,10 @@ class ConnectScenesTour(CommonAction):
         :type title: str
         """
         self.log.info("Execute method _set_hotSpot_goingTo with parameter={}".format(title))
-        self.driver.find_element_by_xpath("//select[@id='edit-select-hotSpots']/option[text()='{}']"
-                                          .format(title)).click()
+        self.driver.execute_script("arguments[0].click();", self.driver.find_element_by_xpath("//select[@id='edit-select-hotSpots']/option[text()='{}']"
+                                          .format(title)))
+        # self.driver.find_element_by_xpath("//select[@id='edit-select-hotSpots']/option[text()='{}']"
+        #                                   .format(title)).click()
 
     def save_edited_hotSpot(self):
         """

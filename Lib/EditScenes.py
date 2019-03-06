@@ -95,11 +95,12 @@ class EditScenes:
             for handle in self.driver.window_handles:
                 self.driver.switch_to.window(handle)
                 try:
-                    wait_until(lambda: name in self.driver.title, timeout=30,
+                    wait_until(lambda: name in self.driver.title, timeout=10,
                            errorMessage="Wrong tour is opened= {}. Tour= {} should be opened".format(self.driver.title, name))
-                except:
-                    pass
-                break
+                    break
+                except Exception as ex:
+                    self.log.info(ex)
+
 
     def edit_tour(self, name):
         """

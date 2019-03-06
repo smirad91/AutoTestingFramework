@@ -50,10 +50,11 @@ class Dashboard:
         """
         self.log.info("Go to view/edit tour")
         wait_until(lambda: check_if_elem_exist(self.btnViewEditTour), timeout=30)
-        self.driver.execute_script("arguments[0].scrollIntoView();", self.btnViewEditTour())
-        time.sleep(5)
-        self.btnViewEditTour().click()
-        wait_until(lambda: check_if_elem_exist(EditScenes(self.driver).divScenes), timeout=30)
+        # self.driver.execute_script("arguments[0].scrollIntoView();", self.btnViewEditTour())
+        # time.sleep(5)
+        # self.btnViewEditTour().click()
+        self.driver.execute_script("arguments[0].click();", self.btnViewEditTour())
+        wait_until(lambda: not check_if_elem_exist(self.btnViewEditTour), timeout=30)
 
     def go_to_edit_profile(self):
         """
