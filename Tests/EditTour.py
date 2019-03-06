@@ -14,7 +14,7 @@ from Lib.common.ScenesGetData import parse_to_scenes
 cl = ConfigLoader()
 createDriver = DriverData()
 driver = createDriver.get_driver()
-log = Log(driver)
+log = Log(createDriver)
 
 driver.get("https://sgpano.com/")
 
@@ -37,14 +37,18 @@ pictures = parse_to_scenes(cl.get("picturesData"))
 
 pictureForDelete = pictures[1]
 uss = UploadedScenesTour(driver)
-uss.delete_uploaded_scene(pictureForDelete.title)
+if not createDriver.driverName == "Safari":
+    uss.delete_uploaded_scene(pictureForDelete.title)
 
 
-us = UploadScenesTour(driver)
+us = UploadScenesTour(createDriver)
 scenes = parse_to_scenes(cl.get("picturesDataToAdd"))
 
-us.upload_scenes(scenes)
-uss.insert_scenes_title(scenes)
+if not createDriver.driverName == "Safari":
+    us.upload_scenes(scenes)
+    uss.insert_scenes_title(scenes)
+else:
+    uss.btnNext().click()
 
 cs = ConnectScenesTour(driver)
 log.info("Add, edit and delete info button")
@@ -69,7 +73,10 @@ cs.change_current_scene("First picture")
 #cs.delete_hotSpotOrInfo_center()
 
 log.info("Insert defined hotSpots")
-cs.insert_hotSpots(scenes)
+if not createDriver.driverName == "Safari":
+    cs.insert_hotSpots(scenes)
+
+cs.choose_theme(4)
 
 #uncomment when bug is resolved
 #cs.delete_hotSpot(pictures[0], pictures[0].hotSpots[0].location)

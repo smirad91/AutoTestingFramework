@@ -206,7 +206,7 @@ class ConnectScenesTour(CommonAction):
                 size = hotSpot.size
                 tourSceneCenter = self.tourImage().size["width"]/2
                 self.log.info("Check if hotspot with x location={} is on center={}".format(hotSpotLocationWidth, tourSceneCenter))
-                if abs(abs(hotSpotLocationWidth + size["width"]/2) - tourSceneCenter) <= 5:  #allowed error of 5 pixels
+                if abs(abs(hotSpotLocationWidth + size["width"]/2) - tourSceneCenter) <= 20:  #allowed error of 20 pixels
                     self.log.screenshot("Hotspot is in center")
                     hotSpotFound = hotSpot
                     return hotSpot
@@ -224,7 +224,6 @@ class ConnectScenesTour(CommonAction):
         :param clickNumber: Number of times to click on arrow
         :type clickNumber: int
         """
-        time.sleep(4)
         self.log.info("Execute method rotate with parameters right={}, clickNumber={}".format(right, clickNumber))
         if clickNumber != 0:
             if right:
@@ -300,9 +299,12 @@ class ConnectScenesTour(CommonAction):
         """
         When scene is chosen wait for it to load
         """
+        self.driver.set_page_load_timeout(30)
+        time.sleep(3)
+        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_class_name("pnlm-render-container").find_element_by_tag_name("canvas")), timeout=60)
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("div[class='pnlm-load-box']")), timeout=30)
-        wait = WebDriverWait(self.driver, 60)
-        wait.until(expected_conditions.invisibility_of_element(self.driver.find_element_by_css_selector("div[class='pnlm-load-box']")))
+        wait_until(lambda: "inline" not in self.driver.find_element_by_css_selector("div[class='pnlm-load-box']").get_attribute('style'), timeout=60)
+
 
     def pan_to_view(self):
         """
@@ -331,6 +333,8 @@ class ConnectScenesTour(CommonAction):
                 self.pan_to_view()
 
     def add_button_to_center(self, hotSpot=True):
+        time.sleep(1)
+        wait_until(lambda: "none" in self.driver.find_element_by_id("themeLabelHide").get_attribute("style"), timeout=30)
         if DriverData.driverName == "Firefox":
             self._add_button_to_center_with_selenium(hotSpot)
         elif DriverData.driverName == "Chrome":
@@ -364,7 +368,9 @@ class ConnectScenesTour(CommonAction):
         wantedX = toLocation["x"] + int(self.tourImage().size["width"] / 2)
         wantedY = toLocation["y"] + int(self.tourImage().size["height"] / 2)
 
-        currentX = fromLocation["x"] + int(button().size["width"] / 2) + 10 - 10
+        currentX = fromLocation["x"] + int(button().size["width"] / 2)
+        if numberOfMoves % 2 != 0:
+            currentX += 10
         currentY = fromLocation["y"] + int(
             button().size["height"] / 2) + scrollToBottom + oneScrollPixels * numberOfMoves
         x = wantedX - currentX

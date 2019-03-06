@@ -65,7 +65,7 @@ class EditScenes:
         scene = self.find_scene_by_name(name)
         if scene:
             self.log.info("Click on delete button")
-            scene.find_element_by_css_selector("a[class='scene_remove']").click()
+            scene.find_element_by_css_selector("a[class='scene_remove']").find_element_by_tag_name("i").click()
             time.sleep(1)
             self.btnDeleteOk().click()
             wait_until(lambda: self.get_number_of_scenes() + 1 == scenesNumber, 10)

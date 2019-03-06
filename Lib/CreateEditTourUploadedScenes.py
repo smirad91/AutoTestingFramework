@@ -9,7 +9,7 @@ from Lib.CreateEditTourConnectScenes import ConnectScenesTour
 from Lib.CreateEditTourUploadScenes import UploadScenesTour
 from Lib.common.CommonAction import CommonAction
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import check_if_elem_exist
+from Lib.common.NonAppSpecific import check_if_elem_exist, scroll_element_to_center
 from Lib.common.WaitAction import wait_until
 
 
@@ -64,6 +64,7 @@ class UploadedScenesTour(CommonAction):
             current_title = scene.find_element_by_id('scence-title').get_attribute("value")
             if current_title == title:
                 self.log.info("Delete scene with title={}".format(title))
+                scroll_element_to_center(self.driver, self.log, scene.find_element_by_css_selector("div[class='icon-delete']"))
                 scene.find_element_by_css_selector("div[class='icon-delete']").click()
                 wait_until(lambda: check_if_elem_exist(self.btnDeleteSceneOk), timeout=10)
                 wait_until(expected_conditions.alert_is_present, timeout=10)
