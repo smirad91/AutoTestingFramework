@@ -6,6 +6,7 @@ import time
 
 from Lib.common import DriverData
 from Lib.common.Log import Log
+from Lib.common.NonAppSpecific import check_if_elem_exist
 from Lib.common.WaitAction import wait_until
 
 class EditScenes:
@@ -66,9 +67,13 @@ class EditScenes:
         if scene:
             self.log.info("Click on delete button")
             scene.find_element_by_css_selector("a[class='scene_remove']").find_element_by_tag_name("i").click()
-            time.sleep(1)
-            self.btnDeleteOk().click()
-            wait_until(lambda: self.get_number_of_scenes() + 1 == scenesNumber, 10)
+            wait_until(lambda: check_if_elem_exist(self.btnDeleteOk), timeout=30)
+            try:
+                self.btnDeleteOk().click()
+                wait_until(lambda: self.get_number_of_scenes() + 1 == scenesNumber, 10)
+            except:
+                self.btnDeleteOk().click()
+                wait_until(lambda: self.get_number_of_scenes() + 1 == scenesNumber, 10)
             self.log.screenshot("Scene is deleted")
 
 
@@ -98,8 +103,8 @@ class EditScenes:
                     wait_until(lambda: name in self.driver.title, timeout=10,
                            errorMessage="Wrong tour is opened= {}. Tour= {} should be opened".format(self.driver.title, name))
                     break
-                except Exception as ex:
-                    self.log.info(ex)
+                except:
+                    pass
 
 
     def edit_tour(self, name):

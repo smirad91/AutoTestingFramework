@@ -10,6 +10,13 @@ from selenium import webdriver
 from selenium.common.exceptions import MoveTargetOutOfBoundsException, ElementClickInterceptedException
 from selenium.webdriver import ActionChains
 
+from Lib.common.WaitAction import wait_until
+
+
+def wait_page_load(driver):
+    state = driver.execute_script("return document.readyState;")
+    print(state)
+    wait_until(lambda: driver.execute_script("return document.readyState;") == "complete", timeout = 30)
 
 def send_text(element, text, mode="set"):
     """

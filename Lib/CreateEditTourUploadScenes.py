@@ -10,7 +10,7 @@ import platform
 
 from Lib.common.DriverData import DriverData
 from Lib.common.CommonAction import CommonAction
-from Lib.common.NonAppSpecific import get_images_path, check_if_elem_exist, scroll_element_to_center
+from Lib.common.NonAppSpecific import get_images_path, check_if_elem_exist, scroll_element_to_center, wait_page_load
 from Lib.common.Log import Log
 from Lib.common.ScenesGetData import get_pictures_string
 from Lib.common.WaitAction import wait_until
@@ -68,9 +68,10 @@ class UploadScenesTour(CommonAction):
         self.log.info("Execute method upload_scenes with parameters imagesPath={}".format(scenes))
         imgs = get_images_path(scenes[0].folder)
         self.log.info("Scenes path is: {}".format(imgs))
-        self.driver.set_page_load_timeout(30)
+        wait_page_load(self.driver)
         self.btnUpload().click()
-        time.sleep(7)
+        wait_page_load(self.driver)
+        #time.sleep(7)
         pyautogui.keyDown("win")
         pyautogui.keyDown("shift")
         pyautogui.typewrite("g")
