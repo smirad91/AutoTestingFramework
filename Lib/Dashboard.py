@@ -4,7 +4,11 @@ Class for manipulating with page https://sgpano.com/virtual-tour-singapore-dashb
 
 import time
 
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
+
 from Lib.CreateEditTourBasicInformation import BasicInformationTour
+from Lib.EditScenes import EditScenes
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import check_if_elem_exist, scroll_to_element, scroll_element_to_center
 from Lib.common.WaitAction import wait_until
@@ -45,9 +49,11 @@ class Dashboard:
         Click on view edit tour
         """
         self.log.info("Go to view/edit tour")
-        time.sleep(3)
+        wait_until(lambda: check_if_elem_exist(self.btnViewEditTour), timeout=30)
+        self.driver.execute_script("arguments[0].scrollIntoView();", self.btnViewEditTour())
+        time.sleep(5)
         self.btnViewEditTour().click()
-        time.sleep(2)
+        wait_until(lambda: check_if_elem_exist(EditScenes(self.driver).divScenes), timeout=30)
 
     def go_to_edit_profile(self):
         """
