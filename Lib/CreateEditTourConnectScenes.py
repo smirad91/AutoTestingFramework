@@ -362,7 +362,7 @@ class ConnectScenesTour(CommonAction):
                     self.driver.execute_script("return window.pageYOffset") + int(
                 self.driver.execute_script("return window.innerHeight"))) + int(
             self.driver.execute_script("return window.innerHeight") / 2)
-        print("moveFor {}".format(moveFor))
+        #print("moveFor {}".format(moveFor))
         numberOfMoves = int(moveFor / oneScrollPixels)
 
         wantedX = toLocation["x"] + int(self.tourImage().size["width"] / 2)
@@ -375,11 +375,11 @@ class ConnectScenesTour(CommonAction):
             button().size["height"] / 2) + scrollToBottom + oneScrollPixels * numberOfMoves
         x = wantedX - currentX
         y = wantedY - currentY
-        print("x: {}".format(x))
-        print("y: {}".format(y))
+        #print("x: {}".format(x))
+        #print("y: {}".format(y))
         time.sleep(1)
-        print("numberOfmoves {}".format(numberOfMoves))
-        print("scroll to bottom {}".format(scrollToBottom))
+        #print("numberOfmoves {}".format(numberOfMoves))
+        #print("scroll to bottom {}".format(scrollToBottom))
         ac = ActionChains(self.driver)
         ac.move_to_element(self.btnHotSpot()).click_and_hold()
 
@@ -414,8 +414,8 @@ class ConnectScenesTour(CommonAction):
         action_chains.click_and_hold()
         scrollFor = self.driver.execute_script("return window.pageYOffset") + int(
             self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
-        print(scrollFor)
-        print(type(scrollFor))
+        #print(scrollFor)
+        #print(type(scrollFor))
         action_chains.move_by_offset(0, scrollFor)
         #action_chains.move_by_offset(10, 0)
 
@@ -426,7 +426,7 @@ class ConnectScenesTour(CommonAction):
         action_chains.perform()
         hiddenPixelsAfter = get_hidden_pixels(self.driver)
         scrolledPixels = hiddenPixelsAfter - hiddenPixels
-        print("pixels {}".format(scrolledPixels))
+        #print("pixels {}".format(scrolledPixels))
         self.driver.execute_script("scroll(0,{})".format(startHidenPixels))
         return scrolledPixels
 

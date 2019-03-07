@@ -14,8 +14,6 @@ from Lib.common.WaitAction import wait_until
 
 
 def wait_page_load(driver):
-    state = driver.execute_script("return document.readyState;")
-    print(state)
     wait_until(lambda: driver.execute_script("return document.readyState;") == "complete", timeout = 30)
 
 def send_text(element, text, mode="set"):
