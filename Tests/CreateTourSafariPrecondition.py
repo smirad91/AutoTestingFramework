@@ -12,7 +12,7 @@ from Lib.common.ScenesGetData import parse_to_scenes
 
 cl = ConfigLoader()
 ##upload scenes
-createDriver1 = DriverData(driver="Chrome")
+createDriver1 = DriverData(driver="Firefox")
 driverTemp = createDriver1.get_driver()
 driverTemp.get("https://sgpano.com/")
 #log = Log(createDriver1)
