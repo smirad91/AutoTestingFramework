@@ -5,14 +5,11 @@ Class for manipulating with page https://sgpano.com/connect-scenes/
 import pyautogui
 from selenium.webdriver import ActionChains
 import time
-
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
 from Lib.common.CommonAction import CommonAction, get_hotSpots, move_mouse_to_element
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import scroll_element_to_center, check_if_elem_exist, send_text, \
-    scroll_element_to_center_with_drag, scroll_element_to_viewPoint_with_selenium, get_location, get_hidden_pixels
+    get_location, get_hidden_pixels, \
+    scroll_element_to_viewpoint_top
 from Lib.common.DriverData import move_mouse_to_middle_of_browser, DriverData
 from Lib.common.WaitAction import wait_until
 
@@ -127,8 +124,17 @@ class ConnectScenesTour(CommonAction):
         wait_until(lambda: self.btnChangeTheme().get_attribute("src") == themeSrc, timeout=20)
         self.log.screenshot("Theme is updated")
 
+    def add_button_to_center(self, hotSpot=True):
+        time.sleep(1)
+        wait_until(lambda: "none" in self.driver.find_element_by_id("themeLabelHide").get_attribute("style"), timeout=30)
+        if DriverData.driverName == "Firefox":
+            self._add_button_to_center_firefox(hotSpot)
+        elif DriverData.driverName == "Chrome":
+            self._add_button_to_center_chrome(hotSpot)
+        elif DriverData.driverName == "Safari":
+            self._add_button_to_center_safari(hotSpot)
 
-    def _add_button_to_center_with_selenium(self, hotSpot):
+    def _add_button_to_center_firefox(self, hotSpot):
         """
         Puts hotSpot or info in center of scene.
 
@@ -149,7 +155,8 @@ class ConnectScenesTour(CommonAction):
         ac.click_and_hold().perform()
         tourSize = self.tourImage().size
         time.sleep(3)
-        scroll_element_to_viewPoint_with_selenium(self.driver, self.tourImage())
+        #scroll_element_to_viewPoint_with_selenium(self.driver, self.tourImage())
+        scroll_element_to_viewpoint_top(self.log, self.driver, self.tourImage())
         time.sleep(1)
         move_mouse_to_middle_of_browser(self.log, self.driver)
         time.sleep(1)
@@ -158,7 +165,7 @@ class ConnectScenesTour(CommonAction):
         time.sleep(1)
         self.log.screenshot("Button is added")
 
-    def _add_button_to_center_pyautogui(self, hotSpot):
+    def _add_button_to_center_chrome(self, hotSpot):
         """
         Puts hotSpot or info in center of scene.
 
@@ -179,6 +186,107 @@ class ConnectScenesTour(CommonAction):
         time.sleep(1)
         self.log.screenshot("Button is added")
 
+    def _add_button_to_center_safari(self, hotSpot):
+        time.sleep(3)
+        self.log.info("Execute method _add_button_to_center")
+        if hotSpot:
+            button = self.btnHotSpot
+        else:
+            button = self.btnInfo
+        oneScrollPixels = self._get_hotSpot_scroll_pixels(hotSpot)
+
+        scroll_element_to_center(self.driver, self.log, self.btnHotSpot())
+        fromLocation = get_location(self.driver, self.btnHotSpot())
+        toLocation = get_location(self.driver, self.tourImage())
+
+        scrollToBottom = self.driver.execute_script("return window.pageYOffset") + int(
+            self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
+
+        moveFor = toLocation["y"] + self.tourImage().size["height"] / 2 - (
+                self.driver.execute_script("return window.pageYOffset") + int(
+            self.driver.execute_script("return window.innerHeight"))) + int(
+            self.driver.execute_script("return window.innerHeight") / 2)
+        # print("moveFor {}".format(moveFor))
+        numberOfMoves = int(moveFor / oneScrollPixels)
+
+        wantedX = toLocation["x"] + int(self.tourImage().size["width"] / 2)
+        wantedY = toLocation["y"] + int(self.tourImage().size["height"] / 2)
+
+        currentX = fromLocation["x"] + int(button().size["width"] / 2)
+        if numberOfMoves % 2 != 0:
+            currentX += 10
+        currentY = fromLocation["y"] + int(
+            button().size["height"] / 2) + scrollToBottom + oneScrollPixels * numberOfMoves
+        x = wantedX - currentX
+        y = wantedY - currentY
+        # print("x: {}".format(x))
+        # print("y: {}".format(y))
+        time.sleep(1)
+        # print("numberOfmoves {}".format(numberOfMoves))
+        # print("scroll to bottom {}".format(scrollToBottom))
+        ac = ActionChains(self.driver)
+        ac.move_to_element(self.btnHotSpot()).click_and_hold()
+
+        self.drag_with_hotspot_safari(ac, scrollToBottom, numberOfMoves, x, y)
+
+        ActionChains(self.driver).release().perform()
+
+    def _get_hotSpot_scroll_pixels(self, hotSpot):
+        """
+        For how many pixels to move hotSpot so that scroll is activated
+
+        :param hotSpot: HotSpot of info button. True if hotSpot.
+        :type hotSpot: bool
+        :return: Pixels to scroll for
+        """
+        if hotSpot:
+            element = self.btnHotSpot()
+        else:
+            element = self.btnInfo()
+        startHidenPixels = get_hidden_pixels(self.driver)
+        scroll_element_to_center(self.driver, self.log, element)
+        action_chains = ActionChains(self.driver)
+        hiddenPixels = get_hidden_pixels(self.driver)
+        fromLocation = get_location(self.driver, element)
+
+        action_chains.move_to_element(element)
+        action_chains.click_and_hold()
+        scrollFor = self.driver.execute_script("return window.pageYOffset") + int(
+            self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
+        #print(scrollFor)
+        #print(type(scrollFor))
+        action_chains.move_by_offset(0, scrollFor)
+        #action_chains.move_by_offset(10, 0)
+
+        # action_chains.move_by_offset(10, 0)
+        # action_chains.move_by_offset(-10, 0)
+        action_chains.move_by_offset(0, -scrollFor)
+        action_chains.release()
+        action_chains.perform()
+        hiddenPixelsAfter = get_hidden_pixels(self.driver)
+        scrolledPixels = hiddenPixelsAfter - hiddenPixels
+        #print("pixels {}".format(scrolledPixels))
+        self.driver.execute_script("scroll(0,{})".format(startHidenPixels))
+        return scrolledPixels
+
+    def drag_with_hotspot_safari(self, act, scrollToBottom, numberOfMoves, x, y):
+        """
+        Drag hotspot in safari with action chains
+
+        :param act: ActionChains
+        :param scrollToBottom: Pixels to scroll hotSpot so that scroll is activated
+        :param numberOfMoves: Number of moves to get tour on center
+        :param x: X location on center of tour
+        :param y: Y location on center of tour
+        """
+        act.move_by_offset(0, scrollToBottom)
+        moveToSide = 10
+        for i in range(numberOfMoves):
+            act.move_by_offset(moveToSide,0)
+            moveToSide *= -1
+        act.move_by_offset(x,y)
+        act.perform()
+        #return moveToSide
 
     def _add_info_data(self, title, detail, url, mode="set"):
         """
@@ -197,6 +305,9 @@ class ConnectScenesTour(CommonAction):
         time.sleep(3)
 
     def get_hotspot_from_center(self):
+        """
+        Return hotspot if on center or raise exception
+        """
         hotSpotFound = None
         for hotSpot in get_hotSpots(self.log, self.driver):
             try:
@@ -332,103 +443,6 @@ class ConnectScenesTour(CommonAction):
                 self.save_hotSpot()
                 self.pan_to_view()
 
-    def add_button_to_center(self, hotSpot=True):
-        time.sleep(1)
-        wait_until(lambda: "none" in self.driver.find_element_by_id("themeLabelHide").get_attribute("style"), timeout=30)
-        if DriverData.driverName == "Firefox":
-            self._add_button_to_center_with_selenium(hotSpot)
-        elif DriverData.driverName == "Chrome":
-            self._add_button_to_center_pyautogui(hotSpot)
-        elif DriverData.driverName == "Safari":
-            self._add_button_to_center_safari(hotSpot)
-
-    def _add_button_to_center_safari(self, hotSpot):
-        time.sleep(3)
-        self.log.info("Execute method _add_button_to_center")
-        if hotSpot:
-            button = self.btnHotSpot
-        else:
-            button = self.btnInfo
-        oneScrollPixels = self._get_hotSpot_scroll_pixels(hotSpot)
-
-        scroll_element_to_center(self.driver, self.log, self.btnHotSpot())
-        fromLocation = get_location(self.driver, self.btnHotSpot())
-        toLocation = get_location(self.driver, self.tourImage())
-
-        scrollToBottom = self.driver.execute_script("return window.pageYOffset") + int(
-            self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
-
-        moveFor = toLocation["y"] + self.tourImage().size["height"] / 2 - (
-                    self.driver.execute_script("return window.pageYOffset") + int(
-                self.driver.execute_script("return window.innerHeight"))) + int(
-            self.driver.execute_script("return window.innerHeight") / 2)
-        #print("moveFor {}".format(moveFor))
-        numberOfMoves = int(moveFor / oneScrollPixels)
-
-        wantedX = toLocation["x"] + int(self.tourImage().size["width"] / 2)
-        wantedY = toLocation["y"] + int(self.tourImage().size["height"] / 2)
-
-        currentX = fromLocation["x"] + int(button().size["width"] / 2)
-        if numberOfMoves % 2 != 0:
-            currentX += 10
-        currentY = fromLocation["y"] + int(
-            button().size["height"] / 2) + scrollToBottom + oneScrollPixels * numberOfMoves
-        x = wantedX - currentX
-        y = wantedY - currentY
-        #print("x: {}".format(x))
-        #print("y: {}".format(y))
-        time.sleep(1)
-        #print("numberOfmoves {}".format(numberOfMoves))
-        #print("scroll to bottom {}".format(scrollToBottom))
-        ac = ActionChains(self.driver)
-        ac.move_to_element(self.btnHotSpot()).click_and_hold()
-
-        self.drag_with_hotspot(ac, scrollToBottom, numberOfMoves, x, y)
-
-        ActionChains(self.driver).release().perform()
-
-
-    def drag_with_hotspot(self, act, scrollToBottom, numberOfMoves, x, y):
-        act.move_by_offset(0, scrollToBottom)
-        moveToSide = 10
-        for i in range(numberOfMoves):
-            act.move_by_offset(moveToSide,0)
-            moveToSide *= -1
-        act.move_by_offset(x,y)
-        act.perform()
-        return moveToSide
-
-
-    def _get_hotSpot_scroll_pixels(self, hotSpot):
-        if hotSpot:
-            element = self.btnHotSpot()
-        else:
-            element = self.btnInfo()
-        startHidenPixels = get_hidden_pixels(self.driver)
-        scroll_element_to_center(self.driver, self.log, element)
-        action_chains = ActionChains(self.driver)
-        hiddenPixels = get_hidden_pixels(self.driver)
-        fromLocation = get_location(self.driver, element)
-
-        action_chains.move_to_element(element)
-        action_chains.click_and_hold()
-        scrollFor = self.driver.execute_script("return window.pageYOffset") + int(
-            self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
-        #print(scrollFor)
-        #print(type(scrollFor))
-        action_chains.move_by_offset(0, scrollFor)
-        #action_chains.move_by_offset(10, 0)
-
-        # action_chains.move_by_offset(10, 0)
-        # action_chains.move_by_offset(-10, 0)
-        action_chains.move_by_offset(0, -scrollFor)
-        action_chains.release()
-        action_chains.perform()
-        hiddenPixelsAfter = get_hidden_pixels(self.driver)
-        scrolledPixels = hiddenPixelsAfter - hiddenPixels
-        #print("pixels {}".format(scrolledPixels))
-        self.driver.execute_script("scroll(0,{})".format(startHidenPixels))
-        return scrolledPixels
 
     def delete_hotSpot(self, scene, hotSpotLocation):
         """
@@ -464,11 +478,17 @@ class ConnectScenesTour(CommonAction):
 
 
     def open_menu_hotSpotOrInfo_center(self):
+        """
+        Open menu of button in center of tour
+        """
         self.get_hotspot_from_center().click()
         wait_until(lambda: check_if_elem_exist(self.btnDeleteHotSpot), timeout=10)
         self.log.screenshot("Clicked on hotspot")
 
     def edit_hotSpot_center(self):
+        """"
+        Edit hotSpot
+        """
         self.log.info("Execute method edit_hotSpot_center")
         self.open_menu_hotSpotOrInfo_center()
         self.btnEditHotSpot().click()

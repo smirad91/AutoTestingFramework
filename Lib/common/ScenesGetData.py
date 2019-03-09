@@ -9,6 +9,13 @@ from Lib.common.NonAppSpecific import get_images_path
 
 
 def get_pictures_string(scenes):
+    """
+    Return all pictures file name in string (example: "first.jpg", "second.jpg", "third.jpg")
+
+    :param scenes: Scenes to upload
+    :type scenes: Scene (from DataStructure folder)
+    :return: str
+    """
     picturesStr = ""
     for scene in scenes:
         picturesStr += '"' + scene.fileName + '" '

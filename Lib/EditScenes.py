@@ -4,6 +4,8 @@ Class for manipulating with page https://sgpano.com/edit-scenes/
 
 import time
 
+from Lib.CreateEditTourBasicInformation import BasicInformationTour
+
 from Lib.common import DriverData
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import check_if_elem_exist
@@ -70,7 +72,10 @@ class EditScenes:
             wait_until(lambda: check_if_elem_exist(self.btnDeleteOk), timeout=30)
             try:
                 self.btnDeleteOk().click()
-                wait_until(lambda: self.get_number_of_scenes() + 1 == scenesNumber, 10)
+                if not scenesNumber == 1:
+                    wait_until(lambda: self.get_number_of_scenes() + 1 == scenesNumber, 10)
+                else:
+                    wait_until(lambda: check_if_elem_exist(BasicInformationTour(self.driver).inpTitle), timeout=30)
             except:
                 self.btnDeleteOk().click()
                 wait_until(lambda: self.get_number_of_scenes() + 1 == scenesNumber, 10)

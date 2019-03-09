@@ -6,7 +6,7 @@ from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.common.keys import Keys
 
 from Lib.common.DriverData import DriverData
-from Lib.common.NonAppSpecific import scroll_to_element, scroll_up_by, scroll_element_to_center, get_location
+from Lib.common.NonAppSpecific import scroll_element_to_viewpoint_top, scroll_up_by, scroll_element_to_center, get_location
 
 
 class CommonAction:

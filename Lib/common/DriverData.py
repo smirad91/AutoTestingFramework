@@ -27,7 +27,7 @@ class DriverData:
     width = None
     mobileToTest = None
     orientation = None
-    tabHeight = None
+    tabHeight = None #for chrome
 
     def __init__(self, driver="Firefox", mobileToTest=None, orientation="Portrait"):
         """
@@ -96,6 +96,15 @@ class DriverData:
         return driver
 
     def create_firefox_driver(self, mobileToTest, orientation):
+        """
+        Create firefox driver
+
+        :param mobileToTest: Mobile to test from file Configuration/MobileTesting.json (example: galaxyS9/S9+)
+        :type mobileToTest: str
+        :param orientation: Can be Landscape or Portrait
+        :type orientation: str
+        :return: WebDriver
+        """
         if mobileToTest is not None:
             size = get_mobile_size(mobileToTest, orientation)
             driver = webdriver.Firefox()
@@ -110,12 +119,21 @@ class DriverData:
         else:
             driver = webdriver.Firefox()
             driver.maximize_window()
-            self.get_set_browser_tab_section_height(driver)
-            set_height_width(driver)
+           # self.get_set_browser_tab_section_height(driver)
+        set_height_width(driver)
         return driver
 
 
     def create_chrome_driver(self, mobileToTest, orientation):
+        """
+        Create Chrome driver
+
+        :param mobileToTest: Mobile to test from file Configuration/MobileTesting.json (example: galaxyS9/S9+)
+        :type mobileToTest: str
+        :param orientation: Can be Landscape or Portrait
+        :type orientation: str
+        :return: WebDriver
+        """
         if mobileToTest is not None:
             driver = self.create_chrome_driver_mobile(mobileToTest, orientation)
         else:
@@ -123,47 +141,71 @@ class DriverData:
         return driver
 
     def create_safari_driver(self, mobileToTest, orientation):
+        """
+        Create safari driver
+
+        :param mobileToTest: Mobile to test from file Configuration/MobileTesting.json (example: galaxyS9/S9+)
+        :type mobileToTest: str
+        :param orientation: Can be Landscape or Portrait
+        :type orientation: str
+        :return: WebDriver
+        """
         driver = webdriver.Safari()
         if mobileToTest is not None:
             size = get_mobile_size(mobileToTest, orientation)
             DriverData.mobileHeight = size["height"]
             DriverData.mobileWidth = size["width"]
             driver.set_window_size(size["width"], size["height"])
-            #set_height_width(driver)
-            #set_firefox_mobile_size(driver, size["width"], size["height"])
-            #self.set_browser_tab_section_height_mobile()
         else:
             driver.maximize_window()
-            #self.get_set_browser_tab_section_height(driver)
-            #set_height_width(driver)
         return driver
 
     def close(self):
+        """
+        Close driver and all handles (all tabs...)
+        """
         close_driver(self.driver)
 
     def set_browser_tab_section_height_mobile(self):
+        """
+        Set DriverData.tabHeight, height of opened browser
+        """
         if self.mobile and self.driverName == "Chrome":
             chrome_options = webdriver.ChromeOptions()
             chrome_options.add_argument("--disable-infobars")
             driver = webdriver.Chrome(chrome_options=chrome_options)
             driver.maximize_window()
             time.sleep(1)
-            DriverData.tabHeight = self.get_set_browser_tab_section_height(driver)
+            self.get_set_browser_tab_section_height(driver)
             driver.close()
-        elif self.mobile and self.driverName == "Firefox":
-            driver = webdriver.Firefox()
-            driver.maximize_window()
-            time.sleep(1)
-            DriverData.tabHeight = self.get_set_browser_tab_section_height(driver)
-            driver.close()
+        # elif self.mobile and self.driverName == "Firefox":
+        #     driver = webdriver.Firefox()
+        #     driver.maximize_window()
+        #     time.sleep(1)
+        #     DriverData.tabHeight = self.get_set_browser_tab_section_height(driver)
+        #     driver.close()
 
     def get_set_browser_tab_section_height(self, driver):
+        """
+        Return and set DriverData.tabHeight of browser
+
+        :param driver: Created driver
+        :type driver: WebDriver
+        :return tabHeight
+        """
         tabHeight = driver.get_window_size()["height"] - int(
             driver.find_element_by_tag_name("html").get_attribute("clientHeight"))
         DriverData.tabHeight = tabHeight
         return tabHeight
 
     def create_chrome_driver_mobile(self, mobileToTest, orientation):
+        """
+        Create chrome driver for mobile
+
+        :param mobileToTest:
+        :param orientation:
+        :return:
+        """
         self.set_browser_tab_section_height_mobile()
         chrome_options = webdriver.ChromeOptions()
         mobileSize = get_mobile_size(mobileToTest, orientation)
@@ -178,6 +220,11 @@ class DriverData:
         return driver
 
     def create_chrome_driver_desktop(self):
+        """
+        Create chrome in desktop mode
+
+        :return: WebDriver
+        """
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--disable-infobars")
         driver = webdriver.Chrome(chrome_options=chrome_options)
@@ -187,11 +234,24 @@ class DriverData:
         return driver
 
 def set_height_width(driver):
+    """
+    Set viewpoint of browser
+
+    :param driver: For which driver to set viewpoint
+    :type driver: WebDriver
+    """
     DriverData.height = driver.execute_script("return window.innerHeight")
     DriverData.width = driver.execute_script("return window.innerWidth")
 
 
 def get_mobile_size(mobileToTest, orientation):
+    """
+    Return mobile size from file Configuration/MobileTesting.json with wanted orientation.
+
+    :param mobileToTest:
+    :param orientation:
+    :return:
+    """
     cl = ConfigLoader(file="MobileTesting.json", lookArgs=False)
     size = cl.get(mobileToTest).split("*")
     firstSize = int(size[0])
@@ -215,6 +275,9 @@ def get_mobile_size(mobileToTest, orientation):
     return {"width": x, "height": y}
 
 def set_firefox_mobile_size(driver, widthSize, heightSize):
+    """
+    Depricated. For Firefox version 57.
+    """
     if DriverData.driverName == "Firefox":
         time.sleep(0.5)
         pyautogui.FAILSAFE = False
@@ -263,7 +326,7 @@ def get_standard_emulated_device_list(mobileToTest):
 
 def move_mouse_to_middle_of_browser(log, driver):
     """
-    Move mouse to the middle of browser viewpoint.
+    Move mouse (hardware, not with selenium) to the middle of browser viewpoint.
     """
     log.info("Execute method move_mouse_to_middle_of_browser")
     fullHeight = driver.get_window_size()["height"]
@@ -290,6 +353,13 @@ def move_mouse_to_middle_of_browser(log, driver):
             _move_to(int(width / 2), int(height / 2) + int(tabs), 1)
 
 def _move_to(x, y, duration):
+    """
+    Move cursor (hardware - using pyautogui).
+
+    :param x: X location on desktop to move to
+    :param y: Y location on desktop to move to
+    :param duration:
+    """
     currentPosition = pyautogui.position()
     if currentPosition[0] == x and currentPosition[1] == y:
         pyautogui.moveRel(1, 1, duration)

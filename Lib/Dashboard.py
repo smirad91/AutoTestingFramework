@@ -10,7 +10,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from Lib.CreateEditTourBasicInformation import BasicInformationTour
 from Lib.EditScenes import EditScenes
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import check_if_elem_exist, scroll_to_element, scroll_element_to_center
+from Lib.common.NonAppSpecific import check_if_elem_exist, scroll_element_to_viewpoint_top, scroll_element_to_center
 from Lib.common.WaitAction import wait_until
 
 
