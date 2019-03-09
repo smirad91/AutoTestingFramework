@@ -41,7 +41,7 @@ if not createDriver.driverName == "Safari":
     uss.delete_uploaded_scene(pictureForDelete.title)
 
 
-us = UploadScenesTour(createDriver)
+us = UploadScenesTour(driver)
 scenes = parse_to_scenes(cl.get("picturesDataToAdd"))
 
 if not createDriver.driverName == "Safari":

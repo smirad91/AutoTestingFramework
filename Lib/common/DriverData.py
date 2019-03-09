@@ -97,19 +97,16 @@ class DriverData:
 
     def create_firefox_driver(self, mobileToTest, orientation):
         if mobileToTest is not None:
-            fprofile = FirefoxProfile()
             size = get_mobile_size(mobileToTest, orientation)
-            DriverData.mobileHeight = size["height"]
-            DriverData.mobileWidth = size["width"]
-            # fprofile.set_preference("devtools.responsive.viewport.width", size["width"])
-            # fprofile.set_preference("devtools.responsive.viewport.height", size["height"])
-            fprofile.set_preference("marionette.enabled", True)
-            driver = webdriver.Firefox(firefox_profile=fprofile)
-            driver.maximize_window()
-            set_height_width(driver)
-            time.sleep(1)
-            set_firefox_mobile_size(driver, size["width"], size["height"])
-            self.set_browser_tab_section_height_mobile()
+            driver = webdriver.Firefox()
+            driver.set_window_size(size['width'], size['height'])
+            innerWidth = driver.execute_script("return window.innerWidth")
+            innerHeight = driver.execute_script("return window.innerHeight")
+            browserWidth = size['width'] + (size['width'] - innerWidth)
+            browserHeight = size['height'] + (size['height'] - innerHeight)
+            driver.close()
+            driver = webdriver.Firefox()
+            driver.set_window_size(browserWidth, browserHeight)
         else:
             driver = webdriver.Firefox()
             driver.maximize_window()
