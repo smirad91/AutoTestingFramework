@@ -1,6 +1,5 @@
-from selenium import webdriver
-from Lib.HomePage import HomePage
-from Lib.SignUp import SignUp
+from Lib.SgPano.HomePage import HomePage
+from Lib.SgPano.SignUp import SignUp
 from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.DriverData import DriverData
 from Lib.common.Log import Log
@@ -14,7 +13,8 @@ driver.get("https://sgpano.com/")
 hp = HomePage(driver)
 hp.go_to_sign_up()
 
-sup = SignUp(driver)
-sup.open_trial_panotour()
+su = SignUp(driver)
+su.open_basic_panotour()
 
-sup.sign_up_trial(cl.get("usernameTrial"), cl.get("passwordTrial"), cl.get("emailTrial"))
+su.sign_up_paid(cl.get("usernameBasic"), cl.get("passwordBasic"), cl.get("emailBasic"),
+                cl.get("payPalEmail"), cl.get("payPalPassword"))

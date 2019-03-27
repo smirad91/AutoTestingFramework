@@ -5,8 +5,8 @@ Class for manipulating with page https://sgpano.com/uploaded-scenes/
 import time
 from selenium.webdriver.support import expected_conditions
 
-from Lib.CreateEditTourConnectScenes import ConnectScenesTour
-from Lib.CreateEditTourUploadScenes import UploadScenesTour
+from Lib.SgPano.CreateEditTourConnectScenes import ConnectScenesTour
+from Lib.SgPano.CreateEditTourUploadScenes import UploadScenesTour
 from Lib.common.CommonAction import CommonAction
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import check_if_elem_exist, scroll_element_to_center

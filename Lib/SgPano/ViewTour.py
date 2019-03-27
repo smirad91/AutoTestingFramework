@@ -3,7 +3,7 @@ Class for manipulating with page https://sgpano.com/tour/ when viewing tour
 """
 
 import time
-from Lib.CreateEditTourConnectScenes import ConnectScenesTour
+from Lib.SgPano.CreateEditTourConnectScenes import ConnectScenesTour
 from Lib.common.CommonAction import get_hotSpots
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import check_if_elem_exist

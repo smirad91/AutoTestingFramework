@@ -4,13 +4,9 @@ Class for manipulating with page https://sgpano.com/virtual-tour-singapore-dashb
 
 import time
 
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
-
-from Lib.CreateEditTourBasicInformation import BasicInformationTour
-from Lib.EditScenes import EditScenes
+from Lib.SgPano.CreateEditTourBasicInformation import BasicInformationTour
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import check_if_elem_exist, scroll_element_to_viewpoint_top, scroll_element_to_center
+from Lib.common.NonAppSpecific import check_if_elem_exist, scroll_element_to_center
 from Lib.common.WaitAction import wait_until
 
 

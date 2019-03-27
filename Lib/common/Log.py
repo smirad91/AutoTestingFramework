@@ -64,7 +64,7 @@ class Log:
         """
         logging.getLogger().info("<p>"+msg+"</p>")
 
-    def screenshot(self, msg, fullScreen=False):
+    def screenshot(self, msg="", fullScreen=False):
         """
         Log screenshot with message
 

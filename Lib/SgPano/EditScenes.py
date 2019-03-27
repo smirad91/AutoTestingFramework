@@ -4,7 +4,7 @@ Class for manipulating with page https://sgpano.com/edit-scenes/
 
 import time
 
-from Lib.CreateEditTourBasicInformation import BasicInformationTour
+from Lib.SgPano.CreateEditTourBasicInformation import BasicInformationTour
 
 from Lib.common import DriverData
 from Lib.common.Log import Log

@@ -1,15 +1,14 @@
 import time
-from Lib.CreateEditTourConnectScenes import ConnectScenesTour
-from Lib.CreateEditTourBasicInformation import BasicInformationTour
-from Lib.CreateEditTourUploadedScenes import UploadedScenesTour
-from Lib.Dashboard import Dashboard
-from Lib.EditScenes import EditScenes
-from Lib.HomePage import HomePage
-from Lib.LogIn import LogIn
+from Lib.SgPano.CreateEditTourConnectScenes import ConnectScenesTour
+from Lib.SgPano.CreateEditTourBasicInformation import BasicInformationTour
+from Lib.SgPano.CreateEditTourUploadedScenes import UploadedScenesTour
+from Lib.SgPano.Dashboard import Dashboard
+from Lib.SgPano.EditScenes import EditScenes
+from Lib.SgPano.HomePage import HomePage
+from Lib.SgPano.LogIn import LogIn
 from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.DriverData import DriverData
-from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import check_if_elem_exist, close_driver
+from Lib.common.NonAppSpecific import check_if_elem_exist
 from Lib.common.ScenesGetData import parse_to_scenes
 from Lib.common.WaitAction import wait_until
 

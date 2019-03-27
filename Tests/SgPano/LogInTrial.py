@@ -1,5 +1,5 @@
-from Lib.HomePage import HomePage
-from Lib.LogIn import LogIn
+from Lib.SgPano.HomePage import HomePage
+from Lib.SgPano.LogIn import LogIn
 from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.DriverData import DriverData
 from Lib.common.Log import Log
@@ -16,6 +16,5 @@ driver.get(url)
 hp = HomePage(driver)
 hp.go_to_log_in()
 
-ln = LogIn(driver)
-ln.log_in_social_media(cl.get("facebookEmail"), cl.get("facebookPass"))
-
+lp = LogIn(driver)
+lp.log_in(cl.get("usernameTrial"), cl.get("passwordTrial"))

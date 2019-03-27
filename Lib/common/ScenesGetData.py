@@ -3,8 +3,8 @@ Class used specially for Scenes and HotSpot class from DataStructure folder.
 """
 from PIL import Image
 
-from Lib.DataStructure.HotSpot import HotSpot
-from Lib.DataStructure.Scene import Scene
+from Lib.SgPano.DataStructure.HotSpot import HotSpot
+from Lib.SgPano.DataStructure.Scene import Scene
 from Lib.common.NonAppSpecific import get_images_path
 
 

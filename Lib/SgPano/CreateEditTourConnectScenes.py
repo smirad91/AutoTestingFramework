@@ -326,7 +326,7 @@ class ConnectScenesTour(CommonAction):
         if hotSpotFound is None:
             raise Exception("HotSpot is not in center")
 
-    def rotate(self, right, clickNumber):
+    def rotate(self, right, clickNumber, useArrows):
         """
         Rotate scene to right or left clickNumber of times.
 
@@ -337,18 +337,32 @@ class ConnectScenesTour(CommonAction):
         """
         self.log.info("Execute method rotate with parameters right={}, clickNumber={}".format(right, clickNumber))
         if clickNumber != 0:
-            if right:
-                button = self.btnRighRotate
+            if useArrows:
+                for i in range(clickNumber):
+                    time.sleep(1.5)
+                    ac = ActionChains(self.driver)
+                    ac.move_to_element(self.tourImage())
+                    ac.click_and_hold()
+                    if right:
+                        ac.move_by_offset(-64, 0)
+                    else:
+                        ac.move_by_offset(64, 0)
+                    ac.release()
+                    ac.perform()
+                    time.sleep(1.5)
             else:
-                button = self.btnLeftRotate
-            for i in range(clickNumber):
-                time.sleep(1.5)
-                wait_until(lambda: check_if_elem_exist(button), timeout=10)
-                button().click()
-                time.sleep(1.5)
+                if right:
+                    button = self.btnRighRotate
+                else:
+                    button = self.btnLeftRotate
+                for i in range(clickNumber):
+                    time.sleep(1.5)
+                    wait_until(lambda: check_if_elem_exist(button), timeout=10)
+                    button().click()
+                    time.sleep(1.5)
         self.log.screenshot("Rotate is done")
 
-    def rotate_scene(self, pixels, width):
+    def rotate_scene(self, pixels, width, useArrows=True):
         """
         Width is full picture size. Pixels are inside of full width. This method will rotate scene
         so that pixels are on center of scene.
@@ -367,13 +381,13 @@ class ConnectScenesTour(CommonAction):
             #move left
             moveForPixels = width/2 - pixels
             numberRotate = int(moveForPixels/oneMove)
-            self.rotate(False, numberRotate)
+            self.rotate(False, numberRotate, useArrows)
             return False, numberRotate
         else:
             #move right
             moveForPixels = pixels - width/2
             numberRotate = int(moveForPixels/oneMove)
-            self.rotate(True, numberRotate)
+            self.rotate(True, numberRotate, useArrows)
             return True, numberRotate
 
     def save_hotSpot(self):
@@ -437,12 +451,46 @@ class ConnectScenesTour(CommonAction):
         for scene in scenes:
             self.change_current_scene(scene.title)
             for hotSpot in scene.hotSpots:
+                # self.add_button_to_center()
+                # self._set_hotSpot_goingTo(hotSpot.goingToScene)
+                # self.save_hotSpot()
+                # hsCenter = self.get_hotspot_from_center()
+                # print("pre {}".format(hsCenter.location))
+                # for i in range(36):
+                #     print(i)
+                #     self.btnRighRotate().click()
+                #     time.sleep(3)
+                #     print("posle {}".format(hsCenter.location))
+                # time.sleep(1000)
                 self.rotate_scene(hotSpot.location, scene.width)
                 self.add_button_to_center()
                 self._set_hotSpot_goingTo(hotSpot.goingToScene)
                 self.save_hotSpot()
                 self.pan_to_view()
 
+    def rotate_scene_cursor(self, location, width):
+        for i in range(7):
+            time.sleep(10)
+            self.half_rotate()
+
+    def half_rotate(self):
+        ac = ActionChains(self.driver)
+        ac.move_to_element(self.tourImage())
+        ac.click_and_hold()
+        print(self.tourImage().size["width"] / 2)
+        ac.move_by_offset(self.tourImage().size["width"] / 2, 0)
+        ac.release()
+        ac.perform()
+
+    def full_rotate(self):
+        ac = ActionChains(self.driver)
+        ac.move_to_element(self.tourImage())
+        ac.move_by_offset(-1 * self.tourImage().size["width"] / 2,0)
+        ac.click_and_hold()
+        print(self.tourImage().size["width"])
+        ac.move_by_offset(self.tourImage().size["width"], 0)
+        ac.release()
+        ac.perform()
 
     def delete_hotSpot(self, scene, hotSpotLocation):
         """
@@ -599,3 +647,5 @@ class ConnectScenesTour(CommonAction):
         except Exception as ex:
             pass
         self.log.screenshot("Hotspot is deleted")
+
+

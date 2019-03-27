@@ -1,13 +1,11 @@
-from Lib.CreateEditTourBasicInformation import BasicInformationTour
-from Lib.CreateEditTourUploadScenes import UploadScenesTour
-from Lib.CreateEditTourUploadedScenes import UploadedScenesTour
-from Lib.Dashboard import Dashboard
-from Lib.HomePage import HomePage
-from Lib.LogIn import LogIn
+from Lib.SgPano.CreateEditTourBasicInformation import BasicInformationTour
+from Lib.SgPano.CreateEditTourUploadScenes import UploadScenesTour
+from Lib.SgPano.CreateEditTourUploadedScenes import UploadedScenesTour
+from Lib.SgPano.Dashboard import Dashboard
+from Lib.SgPano.HomePage import HomePage
+from Lib.SgPano.LogIn import LogIn
 from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.DriverData import DriverData
-from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import close_driver
 from Lib.common.ScenesGetData import parse_to_scenes
 
 cl = ConfigLoader()
