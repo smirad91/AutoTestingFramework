@@ -14,4 +14,4 @@ li = LogIn(driver)
 li.go_to_sign_up()
 
 ra = RegistrationAgent(driver)
-ra.sign_up("firstname", "lastname", "cea", "mobile")
+ra.sign_up(cl.get("signUpFirstName"), cl.get("signUpLastName"), cl.get("signUpCEA"), cl.get("signUpMobile"))

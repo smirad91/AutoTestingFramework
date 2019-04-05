@@ -20,4 +20,5 @@ hp = HomePage(driver)
 hp.go_to_user_profile()
 
 up = UserProfile(driver)
-up.edit_info("firstName", "lastName", "email", "mobile")
+up.edit_info(cl.get("updateProfileFirstName"), cl.get("updateProfileLastName"),
+             cl.get("updateProfileEmail"), cl.get("updateProfileMobile"))
