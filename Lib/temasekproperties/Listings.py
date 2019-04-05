@@ -17,7 +17,7 @@ class Listings:
         self.driver.find_element_by_css_selector("a[class='edd-add-to-cart button blue edd-submit edd-has-js']")
 
     def aCheckout(self):
-        self.driver.find_element_by_css_selector("a[href='https://temasekproperties.com/checkout/']")
+        self.driver.find_element_by_css_selector("a[href='https://Temasekproperties.com/checkout/']")
 
     def inpEmail(self):
         self.driver.find_element_by_css_selector("input[id='edd-email']")
