@@ -1,5 +1,6 @@
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import send_text
+from Lib.common.NonAppSpecific import send_text, check_if_elem_exist
+from Lib.common.WaitAction import wait_until
 
 
 class LogIn:
@@ -24,6 +25,7 @@ class LogIn:
         self.btnSignUp().click()
 
     def log_in(self, username, password):
+        wait_until(lambda: check_if_elem_exist(self.inpUsename), timeout=120)
         send_text(self.inpUsename(), username)
         send_text(self.inpPassword(), password)
         self.btnLogIn().click()
