@@ -3,12 +3,13 @@ Class for manipulating with page https://sgpano.com/membership-levels/
 """
 import time
 
+from Lib.common.CommonAction import CommonAction
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import check_if_elem_exist, send_text, click_on_element_intercepted
 from Lib.common.WaitAction import wait_until
 
 
-class SignUp:
+class SignUp(CommonAction):
     def __init__(self, driver):
         self.driver = driver
         self.log = Log(driver)
@@ -154,21 +155,23 @@ class SignUp:
                                                                                       timeout))
         self._input_signup_info(username, password, mail)
         self.btnPayPal().click()
-        self.wait_paypal_opened(timeout)
-        self.log.info("Add PayPal credentials")
-        wait_until(lambda: check_if_elem_exist(self.inpPayPalEmail), timeout=timeout)
-        send_text(self.inpPayPalEmail(), payPalEmail, mode="update")
-        send_text(self.inpPayPalPass(), payPalPassword, mode="update")
-        self.log.screenshot("Credentials for PayPal are entered")
-        self.btnLogInPayPal().click()
-        wait_until(lambda: check_if_elem_exist(self.btnContinuePayPal), timeout=timeout)
-        self.log.screenshot("Click on continue")
-        wait_until(lambda: click_on_element_intercepted(self.btnContinuePayPal), timeout=timeout)
-        wait_until(lambda: check_if_elem_exist(self.btnPayNow), timeout=timeout)
-        self.log.screenshot("Click on pay now")
-        self.btnPayNow().click()
-        time.sleep(15)
-        self.log.screenshot("Paid")
+       #  self.wait_paypal_opened(timeout)
+       #  self.log.info("Add PayPal credentials")
+       #  wait_until(lambda: check_if_elem_exist(self.inpPayPalEmail), timeout=timeout)
+       #  send_text(self.inpPayPalEmail(), payPalEmail, mode="update")
+       #  send_text(self.inpPayPalPass(), payPalPassword, mode="update")
+       #  self.log.screenshot("Credentials for PayPal are entered")
+       #  self.btnLogInPayPal().click()
+       #  wait_until(lambda: check_if_elem_exist(self.btnContinuePayPal), timeout=timeout)
+       #  self.log.screenshot("Click on continue")
+       #  time.sleep(5)
+       #  wait_until(lambda: click_on_element_intercepted(self.btnContinuePayPal), timeout=timeout)
+       #  wait_until(lambda: check_if_elem_exist(self.btnPayNow), timeout=timeout)
+       #  self.log.screenshot("Click on pay now")
+       # # self.btnPayNow().click()
+       #  time.sleep(15)
+       #  self.log.screenshot("Paid")
+        self.pay_pal(payPalEmail, payPalPassword, timeout)
 
 
 

@@ -22,7 +22,7 @@ hp.go_to_listings()
 l = Listings(driver)
 l.open_listing_by_index(1)
 
-l.purchase_listing("Monthly")
+l.purchase_listing("Monthly", "email", "firstName", "lastName", cl.get("payPalEmail"), cl.get("payPalPassword"))
 
 
 

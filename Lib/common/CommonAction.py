@@ -6,7 +6,9 @@ from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.common.keys import Keys
 
 from Lib.common.DriverData import DriverData
-from Lib.common.NonAppSpecific import scroll_element_to_viewpoint_top, scroll_up_by, scroll_element_to_center, get_location
+from Lib.common.NonAppSpecific import scroll_up_by, scroll_element_to_center, \
+    get_location, send_text, check_if_elem_exist, click_on_element_intercepted
+from Lib.common.WaitAction import wait_until
 
 
 class CommonAction:
@@ -28,6 +30,43 @@ class CommonAction:
     def btnSignUpMobile(self):
         return self.driver.find_element_by_css_selector("ul[class='sh-nav-mobile']").find_element_by_css_selector(
             "a[href*='membership-levels']")
+
+    def inpPayPalEmail(self):
+        return self.driver.find_element_by_css_selector("input[id='email']")
+
+    def inpPayPalPass(self):
+        return self.driver.find_element_by_css_selector("input[id='password']")
+
+    def btnLogInPayPal(self):
+        return self.driver.find_element_by_css_selector("button[id='btnLogin']")
+
+    def btnContinuePayPal(self):
+        return self.driver.find_element_by_css_selector("button[track-submit='choose_FI_interstitial']")
+
+    def btnPayNow(self):
+        return self.driver.find_element_by_css_selector("input[value='Pay Now']")
+
+    def wait_paypal_opened(self, timeout):
+        self.log.info("Execute method wait_paypal_opened()")
+        wait_until(lambda: "PayPal" in self.driver.title, timeout=timeout)
+
+    def pay_pal(self, payPalEmail, payPalPassword, timeout):
+        self.wait_paypal_opened(timeout)
+        self.log.info("Add PayPal credentials")
+        wait_until(lambda: check_if_elem_exist(self.inpPayPalEmail), timeout=timeout)
+        send_text(self.inpPayPalEmail(), payPalEmail, mode="update")
+        send_text(self.inpPayPalPass(), payPalPassword, mode="update")
+        self.log.screenshot("Credentials for PayPal are entered")
+        self.btnLogInPayPal().click()
+        wait_until(lambda: check_if_elem_exist(self.btnContinuePayPal), timeout=timeout)
+        self.log.screenshot("Click on continue")
+        time.sleep(5)
+        wait_until(lambda: click_on_element_intercepted(self.btnContinuePayPal), timeout=timeout)
+        wait_until(lambda: check_if_elem_exist(self.btnPayNow), timeout=timeout)
+        self.log.screenshot("Click on pay now")
+        #self.btnPayNow().click()
+        time.sleep(1000)
+        self.log.screenshot("Paid")
 
     def click_on_element(self, func):
         """
@@ -75,6 +114,8 @@ class CommonAction:
         pyautogui.moveTo(get_location(self.driver, el3)["x"], get_location(self.driver, el3)["y"])
 
 
+
+
 def get_hotSpots(log, driver):
     """
     Get all hotSpots on current scene
@@ -104,3 +145,4 @@ def move_mouse_to_element(driver, log, element):
     x = get_location(driver, element)["x"] + size["width"]/2
     pyautogui.moveTo(x, y, duration=1)
     time.sleep(1)
+
