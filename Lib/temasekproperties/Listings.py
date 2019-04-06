@@ -1,6 +1,6 @@
 import time
-
 from Lib.common.CommonAction import CommonAction
+
 from selenium.webdriver import ActionChains
 
 from Lib.common.Log import Log
@@ -19,6 +19,7 @@ class Listings(CommonAction):
 
     def aCheckout(self):
         return self.driver.find_element_by_css_selector("a[href='https://temasekproperties.com/checkout/']")
+
     def inpEmail(self):
         return self.driver.find_element_by_css_selector("input[id='edd-email']")
 
