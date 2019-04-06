@@ -1,0 +1,14 @@
+{"configuration": {
+  "cea" : "cea",
+  "mobile": "1111",
+
+  "updateProfileFirstName": "firstName",
+  "updateProfileLastName": "lastName",
+  "updateProfileEmail": "email",
+  "updateProfileMobile": "mobile",
+
+  "signUpFirstName": "firstName",
+  "signUpLastName": "lastName",
+  "signUpCEA": "CEA",
+  "signUpMobile": "mobile"
+}}

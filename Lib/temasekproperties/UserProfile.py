@@ -30,10 +30,10 @@ class UserProfile:
 
     def edit_info(self, firstName, lastName, email, mobile):
         self.aEditInfo().click()
-        send_text(self.inpFirstName(), firstName)
-        send_text(self.inpLastName(), lastName)
-        send_text(self.inpEmail(), email)
-        send_text(self.inpMobile(), mobile)
+        send_text(self.inpFirstName(), firstName, mode="update")
+        send_text(self.inpLastName(), lastName, mode="update")
+        send_text(self.inpEmail(), email, mode="update")
+        send_text(self.inpMobile(), mobile, mode="update")
         self.log.screenshot()
       #  self.btnSubmit().click()
         time.sleep(3)

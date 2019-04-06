@@ -24,6 +24,7 @@ class ConfigLoader:
         :param file: File name from Configuration folder with extension .json
         :type file: str
         """
+        file = os.path.basename(os.getcwd()) + "\\" + file
         if lookArgs:
             if is_forwarded("config") is not None:
                 file = is_forwarded("config")

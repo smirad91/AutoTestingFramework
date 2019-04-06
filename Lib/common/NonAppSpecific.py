@@ -28,7 +28,8 @@ def send_text(element, text, mode="set"):
     :type element: WebElement
     :param text: Text to input
     :type text: str
-    :param mode: Possible values are set and update
+    :param mode: Possible values are set and update. Update will clear existing text and put new text,
+    mode set will add to existing text.
     :type mode: str
     :return:
     """
@@ -81,8 +82,11 @@ def check_if_elem_exist(func):
     """
     try:
         func()
+        print("true")
         return True
     except Exception as ex:
+        print("false")
+        print(ex)
         return False
 
 def click_on_element_intercepted(func):

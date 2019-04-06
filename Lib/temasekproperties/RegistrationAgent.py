@@ -28,4 +28,4 @@ class RegistrationAgent:
         send_text(self.inpLastName(), lastname)
         send_text(self.inpCEA(), CEA)
         send_text(self.inpMobileNumber(), mobile)
-        self.btnNext().click()
+        #self.btnNext().click()
