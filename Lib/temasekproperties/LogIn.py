@@ -22,6 +22,7 @@ class LogIn:
         return self.driver.find_element_by_id("wp-submit")
 
     def go_to_sign_up(self):
+        self.log.info("Execute method go_to_sign_up")
         self.btnSignUp().click()
 
     def log_in(self, username, password):

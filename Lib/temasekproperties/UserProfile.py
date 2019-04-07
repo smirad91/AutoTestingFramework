@@ -35,6 +35,6 @@ class UserProfile:
         send_text(self.inpEmail(), email, mode="update")
         send_text(self.inpMobile(), mobile, mode="update")
         self.log.screenshot()
-      #  self.btnSubmit().click()
+        self.btnSubmit().click()
         time.sleep(3)
 

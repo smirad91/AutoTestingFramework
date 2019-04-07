@@ -62,19 +62,25 @@ class Listings(CommonAction):
         return allListing
 
     def change_page(self, page):
+        self.log.info("Execute method change_page with parameter page={}".format(page))
         if page != 1:
             self.driver.get("https://temasekproperties.com/listings/?sf_paged={}".format(page))
+        self.log.screenshot("Page opened")
 
     def open_listing_by_index(self, index):
-        return self.get_all_listings()[int(index)-1].find_element_by_tag_name("a").click()
+        self.log.info("Execute method open_listing_by_index with parameter index={}".format(index))
+        self.get_all_listings()[int(index)-1].find_element_by_tag_name("a").click()
 
     def purchase_listing(self, payment, email, firstName, lastName, payPalEmail, payPalPassword):
+        self.log.info("Execute method purchase_listing")
         #formElement = self.driver.find_element_by_css_selector("form[id='edd_purchase_9273']") #edd_download_purchase_form edd_purchase_9273
         formElement = self.driver.find_element_by_css_selector("div[class='edd_price_options edd_single_mode']")
         purchases = formElement.find_elements_by_css_selector("span[class='edd_price_option_name']")
         for purchase in purchases:
             if purchase.text == payment:
                 purchase.find_element_by_xpath('..').click()
+                time.sleep(1)
+                self.log.screenshot("Selected payment={}".format(payment))
                 break
         self.aPurchase().click()
         time.sleep(5)
@@ -82,6 +88,7 @@ class Listings(CommonAction):
         send_text(self.inpEmail(), email, mode="update")
         send_text(self.inpFirstName(), firstName, mode="update")
         send_text(self.inpLastName(), lastName, mode="update")
+        self.log.screenshot("Inserted email, firstname, lastname")
         self.btnFinalPurchase().click()
         wait_until(lambda: check_if_elem_exist(self.btnPayPal), 30)
         time.sleep(10)
@@ -100,6 +107,7 @@ class Listings(CommonAction):
         self.driver.find_element_by_css_selector("input[name='submit.x']").click()
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_xpath(
             "//h1[contains(text(),'{}')]".format("Your purchase was successful"))))
+        self.log.screenshot("Listing purchased")
 
 
     def play(self):

@@ -2,10 +2,10 @@
   "cea" : "cea",
   "mobile": "1111",
 
-  "updateProfileFirstName": "firstName",
-  "updateProfileLastName": "lastName",
-  "updateProfileEmail": "email",
-  "updateProfileMobile": "mobile",
+  "updateProfileFirstName": "",
+  "updateProfileLastName": "",
+  "updateProfileEmail": "",
+  "updateProfileMobile": "",
 
   "signUpFirstName": "firstName",
   "signUpLastName": "lastName",
