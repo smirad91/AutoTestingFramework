@@ -46,7 +46,7 @@ class CommonAction:
     def btnPayNow(self):
         return self.driver.find_element_by_css_selector("input[value='Pay Now']")
 
-    def wait_paypal_opened(self, timeout):
+    def wait_paypal_opened(self, timeout=60):
         self.log.info("Execute method wait_paypal_opened()")
         wait_until(lambda: "PayPal" in self.driver.title, timeout=timeout)
 
@@ -65,7 +65,6 @@ class CommonAction:
         wait_until(lambda: check_if_elem_exist(self.btnPayNow), timeout=timeout)
         self.log.screenshot("Click on pay now")
         #self.btnPayNow().click()
-        time.sleep(1000)
         self.log.screenshot("Paid")
 
     def click_on_element(self, func):

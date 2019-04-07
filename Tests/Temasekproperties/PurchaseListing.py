@@ -4,8 +4,8 @@ from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.DriverData import DriverData
 from Lib.common.Log import Log
 from Lib.temasekproperties.HomePage import HomePage
+from Lib.temasekproperties.Listings import Listings
 from Lib.temasekproperties.LogIn import LogIn
-from Lib.temasekproperties.UserProfile import UserProfile
 
 cl = ConfigLoader()
 createDriver = DriverData(driver="Chrome")
@@ -17,8 +17,14 @@ li = LogIn(driver)
 li.log_in("testagent", "test123")
 
 hp = HomePage(driver)
-hp.go_to_user_profile()
+hp.go_to_listings()
 
-up = UserProfile(driver)
-up.edit_info(cl.get("updateProfileFirstName"), cl.get("updateProfileLastName"),
-             cl.get("updateProfileEmail"), cl.get("updateProfileMobile"))
+l = Listings(driver)
+l.change_page(cl.get("purchaseListingPage"))
+l.open_listing_by_index(cl.get("purchaseListingIndex"))
+
+l.purchase_listing("Monthly", "email@ggg.com", "firstName", "lastName",
+                   cl.get("purchaseListingPayPalEmail"), cl.get("purchaseListingPayPalPassword"))
+
+
+

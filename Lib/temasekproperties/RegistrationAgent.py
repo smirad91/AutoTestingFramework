@@ -1,3 +1,5 @@
+import time
+
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import send_text
 
@@ -29,3 +31,4 @@ class RegistrationAgent:
         send_text(self.inpCEA(), CEA)
         send_text(self.inpMobileNumber(), mobile)
         #self.btnNext().click()
+        time.sleep(10)

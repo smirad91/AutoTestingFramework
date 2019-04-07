@@ -143,4 +143,5 @@ class AddNewDownloads:
         scroll_element_to_center(self.driver, self.log, self.inpSaveDraft())
         time.sleep(1)
         self.log.screenshot()
-        self.inpSaveDraft().click()
+        #self.inpSaveDraft().click()
+        self.driver.execute_script("arguments[0].click();", self.inpSaveDraft())

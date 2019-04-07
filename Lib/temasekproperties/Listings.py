@@ -4,7 +4,7 @@ from Lib.common.CommonAction import CommonAction
 from selenium.webdriver import ActionChains
 
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import send_text, check_if_elem_exist
+from Lib.common.NonAppSpecific import send_text, check_if_elem_exist, click_on_element_intercepted
 from Lib.common.WaitAction import wait_until
 
 
@@ -48,19 +48,25 @@ class Listings(CommonAction):
         return self.driver.find_element_by_css_selector("div[class*='gui-floor hasHover']").\
             find_element_by_css_selector("i[class='icon icon-dpad-up']")
 
+    def btnPayPal(self):
+        return self.driver.find_element_by_css_selector("span[class='paypal-button-content']")
+
     def get_all_listings(self):
         root = self.driver.find_element_by_css_selector("div[class='edd_downloads_list edd_download_columns_3']")
         allDivs = root.find_elements_by_tag_name("div")
         allListing = []
         for div in allDivs:
-            print(div.get_attribute("class"))
-            if div.get_attribute("class") == "edd_download":
+            if div.get_attribute("class") == "edd_download" or \
+                    div.get_attribute("class") == "edd_download download_bought":
                 allListing.append(div)
-        print(len(allListing))
         return allListing
 
+    def change_page(self, page):
+        if page != 1:
+            self.driver.get("https://temasekproperties.com/listings/?sf_paged={}".format(page))
+
     def open_listing_by_index(self, index):
-        return self.get_all_listings()[index-1].find_element_by_tag_name("a").click()
+        return self.get_all_listings()[int(index)-1].find_element_by_tag_name("a").click()
 
     def purchase_listing(self, payment, email, firstName, lastName, payPalEmail, payPalPassword):
         #formElement = self.driver.find_element_by_css_selector("form[id='edd_purchase_9273']") #edd_download_purchase_form edd_purchase_9273
@@ -73,12 +79,28 @@ class Listings(CommonAction):
         self.aPurchase().click()
         time.sleep(5)
         self.aCheckout().click()
-        send_text(self.inpEmail(), email)
-        send_text(self.inpFirstName(), firstName)
-        send_text(self.inpLastName(), lastName)
+        send_text(self.inpEmail(), email, mode="update")
+        send_text(self.inpFirstName(), firstName, mode="update")
+        send_text(self.inpLastName(), lastName, mode="update")
         self.btnFinalPurchase().click()
+        wait_until(lambda: check_if_elem_exist(self.btnPayPal), 30)
+        time.sleep(10)
+        self.btnPayPal().click()
+        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_id("payment_type_paypal")), timeout=60)
+        self.driver.find_element_by_id("payment_type_paypal").click()
+        self.driver.find_element_by_css_selector("input[name='unified_login.x']").click()
         #paypal window is opened
-        self.pay_pal(payPalEmail, payPalPassword, 60)
+        self.log.info("Add PayPal credentials")
+        wait_until(lambda: check_if_elem_exist(self.inpPayPalEmail), timeout=60)
+        send_text(self.inpPayPalEmail(), payPalEmail, mode="update")
+        send_text(self.inpPayPalPass(), payPalPassword, mode="update")
+        self.log.screenshot("Credentials for PayPal are entered")
+        self.btnLogInPayPal().click()
+        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("input[name='submit.x']")))
+        self.driver.find_element_by_css_selector("input[name='submit.x']").click()
+        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_xpath(
+            "//h1[contains(text(),'{}')]".format("Your purchase was successful"))))
+
 
     def play(self):
         self.driver.switch_to.frame(self.driver.find_element_by_id("frame_me"))

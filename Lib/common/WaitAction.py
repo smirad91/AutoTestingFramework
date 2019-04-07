@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 
-def wait_until(somepredicate, timeout, period=1, errorMessage="Timeout expired"):
+def wait_until(somepredicate, timeout=60, period=1, errorMessage="Timeout expired"):
     """
     Somepredicate is function that returns True or False. This function is executed every for period during
     timeout. When somepredicate return True wait is done. If somepredicate don't return True during timeout,

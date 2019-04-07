@@ -10,5 +10,10 @@
   "signUpFirstName": "firstName",
   "signUpLastName": "lastName",
   "signUpCEA": "CEA",
-  "signUpMobile": "mobile"
+  "signUpMobile": "mobile",
+
+  "purchaseListingPage": "2",
+  "purchaseListingIndex": "2",
+  "purchaseListingPayPalEmail": "buyerlee@gmail.com",
+  "purchaseListingPayPalPassword": "qazwsxedc"
 }}

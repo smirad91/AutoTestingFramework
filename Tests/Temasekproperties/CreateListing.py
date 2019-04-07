@@ -1,4 +1,3 @@
-import time
 from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.DriverData import DriverData
 from Lib.common.Log import Log
