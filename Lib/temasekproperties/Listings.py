@@ -73,6 +73,7 @@ class Listings(CommonAction):
 
     def purchase_listing(self, payment, email, firstName, lastName, payPalEmail, payPalPassword):
         self.log.info("Execute method purchase_listing")
+        time.sleep(5)
         #formElement = self.driver.find_element_by_css_selector("form[id='edd_purchase_9273']") #edd_download_purchase_form edd_purchase_9273
         formElement = self.driver.find_element_by_css_selector("div[class='edd_price_options edd_single_mode']")
         purchases = formElement.find_elements_by_css_selector("span[class='edd_price_option_name']")
