@@ -4,7 +4,7 @@ from Lib.common.CommonAction import CommonAction
 from selenium.webdriver import ActionChains
 
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import send_text, check_if_elem_exist, click_on_element_intercepted
+from Lib.common.NonAppSpecific import send_text, check_if_elem_exist, click_on_element_intercepted, wait_page_load
 from Lib.common.WaitAction import wait_until
 
 
@@ -70,6 +70,7 @@ class Listings(CommonAction):
     def open_listing_by_index(self, index):
         self.log.info("Execute method open_listing_by_index with parameter index={}".format(index))
         self.get_all_listings()[int(index)-1].find_element_by_tag_name("a").click()
+        wait_page_load(self.driver)
 
     def purchase_listing(self, payment, email, firstName, lastName, payPalEmail, payPalPassword):
         self.log.info("Execute method purchase_listing")
