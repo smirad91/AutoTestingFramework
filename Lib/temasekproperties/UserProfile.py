@@ -26,7 +26,7 @@ class UserProfile:
         return self.driver.find_element_by_id('mobile_number')
 
     def btnSubmit(self):
-        return self.driver.find_element_by_css_selector("button[name='submit']")
+        return self.driver.find_element_by_css_selector("input[name='submit']")
 
     def edit_info(self, firstName, lastName, email, mobile):
         self.aEditInfo().click()
