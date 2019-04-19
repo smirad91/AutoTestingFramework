@@ -1,3 +1,5 @@
+import time
+
 from Lib.common.ConfigLoader import ConfigLoader
 from Lib.common.DriverData import DriverData
 from Lib.common.Log import Log
@@ -16,7 +18,7 @@ li = LogIn(driver)
 li.log_in("testlist", "test123")
 
 hp = HomePage(driver)
-hp.go_to_downloads()
+#hp.go_to_downloads()
 
 d = Downloads(driver)
 d.go_to_add_new()
@@ -40,8 +42,9 @@ ad.add_tag("autotestTag")
 ad.enable_variable_pricing()
 
 ad.set_excerpt("excerpt description")
-ad.choose_author("bmuser (bmuser)")
+ad.choose_author("list agenta (listagenta)")
 
-ad.choose_author("testlist (testlist)")
+#ad.choose_author("testlist (testlist)")
+ad.set_download_image()
 
 ad.save_draft()

@@ -9,6 +9,7 @@ import pyautogui
 from selenium import webdriver
 from selenium.common.exceptions import MoveTargetOutOfBoundsException, ElementClickInterceptedException
 from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 from Lib.common.WaitAction import wait_until
 
@@ -309,3 +310,30 @@ def is_forwarded(argument):
                 return arg.split("=")[1]
     except:
         pass
+
+def upload_scenes_windows(driver, driverName, log, imgs, scenes):
+    from pywinauto.application import Application
+
+    time.sleep(3)
+    dialog_name = ""
+    if driverName == "Firefox":
+        dialog_name = "File Upload"
+    elif driverName == "Chrome":
+        dialog_name = "Open"
+    app = Application().connect(title=dialog_name)
+    app.Dialog.ComboBoxEx.Edit.type_keys(imgs)
+    log.screenshot("Entered path to images", True)
+
+    time.sleep(2)
+    log.screenshot("Pre klika", True)
+    app.dlg.Open.click()
+    time.sleep(2)
+    log.screenshot("Nakon klika",True)
+    #ActionChains(driver).send_keys(Keys.ENTER).perform()
+    app.Dialog.ComboBoxEx.Edit.type_keys(scenes)
+    time.sleep(2)
+    log.screenshot("Pre klika", True)
+    app.dlg.Open.click()
+    time.sleep(2)
+    log.screenshot("Nakon klika", True)
+    log.screenshot("Entered all images", True)
