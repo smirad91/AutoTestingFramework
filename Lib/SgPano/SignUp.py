@@ -133,7 +133,7 @@ class SignUp(CommonAction):
         self._input_signup_info(username, password, mail)
         self.log.info("Click on submit")
         self.btnSubmit().click()
-        wait_until(lambda: self.driver.find_element_by_css_selector("div[class='titlebar-title sh-table-cell']/h2")
+        wait_until(lambda: self.driver.find_element_by_css_selector("div[class='titlebar-title sh-table-cell']").find_element_by_tag_name("h2")
                    .text == "Membership Confirmation", timeout=timeout, period=2,
                    errorMessage="Problem with sign up. Check log screenshots")
         self.log.screenshot("Sign up is successful")

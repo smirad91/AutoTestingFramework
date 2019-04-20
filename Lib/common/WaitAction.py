@@ -28,8 +28,8 @@ def wait_until(somepredicate, timeout=60, period=1, errorMessage="Timeout expire
     while time.time() < mustend:
         try:
             value = somepredicate()
-        except:
-            pass
+        except Exception as ex:
+            print(ex)
         if value:
             return True
         time.sleep(period)
