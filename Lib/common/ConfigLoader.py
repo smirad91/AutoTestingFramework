@@ -27,7 +27,7 @@ class ConfigLoader:
         file = os.path.basename(os.getcwd()) + "\\" + file
         if lookArgs:
             if is_forwarded("config") is not None:
-                file = is_forwarded("config")
+                file = os.path.basename(os.getcwd()) + "\\" + is_forwarded("config")
         config_file = os.path.join(self.getConfigurationPath(), file)
         with open(config_file) as f:
             self.data = json.load(f)['configuration']
