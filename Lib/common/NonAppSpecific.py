@@ -50,7 +50,7 @@ def get_images_path(folderName):
     :return: path
     """
     path = os.path.abspath(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, 'Images', folderName))
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, 'Images', os.path.basename(os.getcwd()),folderName))
     return path
 
 def get_location(driver, element):
