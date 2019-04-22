@@ -115,7 +115,7 @@ class UploadScenesTour(CommonAction):
         self.log.info("Scenes path is: {}".format(imgs))
         scroll_element_to_center(self.driver, self.log, self.btnUpload())
         self.btnUpload().click()
-        time.sleep(3)
+        time.sleep(4)
         dialog_name = ""
         if DriverData.driverName == "Firefox":
             dialog_name = "File Upload"
@@ -124,11 +124,11 @@ class UploadScenesTour(CommonAction):
         app = Application().connect(title=dialog_name)
         app.Dialog.ComboBoxEx.Edit.type_keys(imgs)
         self.log.screenshot("Entered path to images", True)
-        time.sleep(2)
+        time.sleep(4)
         app.dlg.Open.click()
         time.sleep(2)
         app.Dialog.ComboBoxEx.Edit.type_keys(get_pictures_string(scenes))
-        time.sleep(2)
+        time.sleep(4)
         app.dlg.Open.click()
         self.log.screenshot("Entered all images", True)
 
