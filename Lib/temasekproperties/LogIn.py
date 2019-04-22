@@ -30,3 +30,4 @@ class LogIn:
         send_text(self.inpUsename(), username)
         send_text(self.inpPassword(), password)
         self.btnLogIn().click()
+        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_id("header-navigation")))

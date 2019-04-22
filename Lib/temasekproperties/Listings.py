@@ -51,6 +51,14 @@ class Listings(CommonAction):
     def btnPayPal(self):
         return self.driver.find_element_by_css_selector("span[class='paypal-button-content']")
 
+    def inpSearch(self):
+        return self.driver.find_element_by_css_selector("input[placeholder='Search …']")
+
+
+
+    def btnSearch(self):
+        return self.driver.find_element_by_css_selector("input[name='_sf_submit']")
+
     def get_all_listings(self):
         root = self.driver.find_element_by_css_selector("div[class='edd_downloads_list edd_download_columns_3']")
         allDivs = root.find_elements_by_tag_name("div")
@@ -163,3 +171,19 @@ class Listings(CommonAction):
             return True
         except Exception as ex:
             return False
+
+    def search_for(self, searchFor):
+        send_text(self.inpSearch(), searchFor)
+        self.btnSearch().click()
+        wait_page_load(self.driver)
+
+    # def book(self, listingName):
+    #     all_listings = self.get_all_listings()
+    #     for listing in all_listings:
+    #        if listingName in listing.find_element_by_css_selector("a[itemprop='url']").text:
+    #            listing.find_element_by_tag_name("button").click()
+    #            wait_until(lambda: "Service" in self.active_booking_step())
+    #            break
+
+
+

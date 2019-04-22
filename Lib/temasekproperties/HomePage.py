@@ -1,7 +1,9 @@
 import time
 
+from selenium.webdriver import ActionChains
+
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import check_if_elem_exist
+from Lib.common.NonAppSpecific import check_if_elem_exist, send_text, wait_page_load
 from Lib.common.WaitAction import wait_until
 
 
@@ -17,6 +19,7 @@ class HomePage:
     def btnDownloads(self):
         return self.driver.find_element_by_css_selector("a[href='edit.php?post_type=download']")
 
+
     def go_to_downloads(self):
         self.btnTemasekproperties().click()
         wait_until(lambda: self.driver.find_element_by_tag_name("h1").text == "Dashboard", 20)
@@ -29,5 +32,28 @@ class HomePage:
         startElem.find_element_by_css_selector("li[class*='menu-item-9129']").click()
 
     def go_to_listings(self):
+        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("nav[id='header-navigation']")))
         startElem = self.driver.find_element_by_css_selector("nav[id='header-navigation']")
         startElem.find_element_by_css_selector("a[href='https://temasekproperties.com/listings/']").click()
+
+    def go_to_resources_booked(self):
+        start_elem = self.driver.find_element_by_id("header-navigation") # for mobile: header-navigation-mobile
+        start_elem.find_element_by_id("menu-item-9408").click()
+        time.sleep(2)
+        wait_until(lambda: "block" in self.driver.find_element_by_id("header-navigation").find_element_by_id("menu-item-9408").find_element_by_tag_name("ul").get_attribute("style"))
+        self.driver.find_element_by_id("header-navigation").find_element_by_id("menu-item-9434").click()
+        time.sleep(3)
+        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_id("DataTables_Table_0_processing")))
+        wait_until(lambda: "none" in self.driver.find_element_by_id("DataTables_Table_0_processing").get_attribute("style"))
+        self.log.screenshot("resource booked opened")
+
+    def go_to_resources_booking(self):
+        start_elem = self.driver.find_element_by_id("header-navigation") # for mobile: header-navigation-mobile
+        start_elem.find_element_by_id("menu-item-9408").click()
+        time.sleep(2)
+        wait_until(lambda: "block" in start_elem.find_element_by_id("menu-item-9408").find_element_by_tag_name("ul").get_attribute("style"))
+        start_elem.find_element_by_id("menu-item-9409").click()
+        time.sleep(3)
+        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("div[class='bookly-progress-tracker bookly-table']")))
+        # wait_until(lambda: "none" in self.driver.find_element_by_id("DataTables_Table_0_processing").get_attribute("style"))
+        self.log.screenshot("resource booking opened")
