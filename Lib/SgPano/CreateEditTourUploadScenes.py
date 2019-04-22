@@ -81,7 +81,7 @@ class UploadScenesTour(CommonAction):
         self.log.screenshot("Button upload clicked", True)
         time.sleep(2)
         pyautogui.typewrite(imgs)
-        time.sleep(2)
+        time.sleep(4)
         pyautogui.press('enter')
         time.sleep(1)
         pyautogui.press('right')
@@ -95,7 +95,7 @@ class UploadScenesTour(CommonAction):
         pyautogui.press('down')
         time.sleep(1)
         pyautogui.keyUp("shift")
-        time.sleep(2)
+        time.sleep(4)
         self.log.screenshot("All scenes should be marked. Press enter.", True)
         pyautogui.press('enter')
 
