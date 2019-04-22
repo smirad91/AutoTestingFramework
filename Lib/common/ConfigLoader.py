@@ -24,10 +24,10 @@ class ConfigLoader:
         :param file: File name from Configuration folder with extension .json
         :type file: str
         """
-        file = os.path.basename(os.getcwd()) + "\\" + file
+        file = os.path.join(os.path.basename(os.getcwd()), file)
         if lookArgs:
             if is_forwarded("config") is not None:
-                file = os.path.basename(os.getcwd()) + "\\" + is_forwarded("config")
+                file = os.path.join(os.path.basename(os.getcwd()), is_forwarded("config"))
         config_file = os.path.join(self.getConfigurationPath(), file)
         with open(config_file) as f:
             self.data = json.load(f)['configuration']
