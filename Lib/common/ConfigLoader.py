@@ -13,7 +13,7 @@ class ConfigLoader:
         return os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                            os.pardir, os.pardir, "Configuration"))
 
-    def __init__(self, file="Case1.json", lookArgs=True):
+    def __init__(self, file="Case1.json", mobileConfig=False):
         """
         Mechanism for getting parameters from json file. File should be in Configuration folder and
         it should look like this: {"configuration": {
@@ -24,8 +24,8 @@ class ConfigLoader:
         :param file: File name from Configuration folder with extension .json
         :type file: str
         """
-        file = os.path.join(os.path.basename(os.getcwd()), file)
-        if lookArgs:
+        if not mobileConfig:
+            file = os.path.join(os.path.basename(os.getcwd()), file)
             if is_forwarded("config") is not None:
                 file = os.path.join(os.path.basename(os.getcwd()), is_forwarded("config"))
         config_file = os.path.join(self.getConfigurationPath(), file)

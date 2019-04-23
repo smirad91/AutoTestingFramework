@@ -253,7 +253,7 @@ def get_mobile_size(mobileToTest, orientation):
     :param orientation:
     :return:
     """
-    cl = ConfigLoader(file="MobileTesting.json", lookArgs=False)
+    cl = ConfigLoader(file="MobileTesting.json", mobileConfig=True)
     size = cl.get(mobileToTest).split("*")
     firstSize = int(size[0])
     secondSize = int(size[1])
