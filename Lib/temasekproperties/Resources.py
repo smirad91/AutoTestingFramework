@@ -1,5 +1,6 @@
 import time
 
+from Lib.common.DriverData import DriverData
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import check_if_elem_exist
 from Lib.common.WaitAction import wait_until
@@ -45,12 +46,19 @@ class Resources:
         self.log.screenshot("Selected booking for {} and {}".format(serviceName, selectionName))
 
     def booking_steps(self):
-        self.btnNext().click()
+        if DriverData.mobile:
+            self.driver.find_element_by_css_selector(
+                "button[class='bookly-right bookly-mobile-next-step bookly-js-mobile-next-step bookly-btn bookly-none ladda-button']").click()
+        else:
+            self.btnNext().click()
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("div[class='bookly-box']")))
         wait_until(lambda: "Below you can find a list of available time slots" in self.driver.find_element_by_css_selector("div[class='bookly-box']").text)
         self.log.screenshot("Opened 'Time'")
-        self.driver.find_element_by_css_selector("div[class='bookly-column bookly-js-first-column']")\
-            .find_element_by_css_selector("button[class='bookly-hour']").click()
+        if not DriverData.mobile:
+            self.driver.find_element_by_css_selector("div[class='bookly-column bookly-js-first-column']")\
+                .find_element_by_css_selector("button[class='bookly-hour']").click()
+        else:
+            self.driver.find_element_by_css_selector("button[class='bookly-next-step bookly-js-next-step bookly-btn ladda-button']")
         #wait_until(lambda: "Details" in self.active_booking_step())
         wait_until(lambda: self.active_booking_step("Details"))
         self.log.screenshot("'Details' opened")

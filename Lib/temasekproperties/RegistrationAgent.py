@@ -1,7 +1,8 @@
 import time
 
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import send_text
+from Lib.common.NonAppSpecific import send_text, check_if_elem_exist
+from Lib.common.WaitAction import wait_until
 
 
 class RegistrationAgent:
@@ -34,5 +35,4 @@ class RegistrationAgent:
         send_text(self.inpMobileNumber(), mobile)
         self.log.screenshot("Entered info")
         self.btnNext().click()
-        time.sleep(10)
-        self.log.screenshot("Signed up")
+        wait_until(lambda: not check_if_elem_exist(self.inpFirstName))

@@ -2,6 +2,7 @@ import time
 
 from selenium.webdriver import ActionChains
 
+from Lib.common.DriverData import DriverData
 from Lib.common.Log import Log
 from Lib.common.NonAppSpecific import check_if_elem_exist, send_text, wait_page_load
 from Lib.common.WaitAction import wait_until
@@ -19,6 +20,8 @@ class HomePage:
     def btnDownloads(self):
         return self.driver.find_element_by_css_selector("a[href='edit.php?post_type=download']")
 
+    def spnExpandMenu(self):
+        return self.driver.find_element_by_css_selector("span[class='c-hamburger c-hamburger--htx']")
 
     def go_to_downloads(self):
         self.btnTemasekproperties().click()
@@ -26,18 +29,30 @@ class HomePage:
         self.btnDownloads().click()
 
     def go_to_user_profile(self):
-        startElem = self.driver.find_element_by_css_selector("nav[id='header-navigation']").find_element_by_id("menu-item-9049")
+        if DriverData.mobile:
+            self.spnExpandMenu().click()
+            startElem = self.driver.find_element_by_css_selector("ul[class='sh-nav-mobile']").find_element_by_id("menu-item-9049")
+        else:
+            startElem = self.driver.find_element_by_css_selector("nav[id='header-navigation']").find_element_by_id("menu-item-9049")
         startElem.find_element_by_tag_name("a").click()
         time.sleep(1)
         startElem.find_element_by_css_selector("li[class*='menu-item-9129']").click()
 
     def go_to_listings(self):
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("nav[id='header-navigation']")))
-        startElem = self.driver.find_element_by_css_selector("nav[id='header-navigation']")
-        startElem.find_element_by_css_selector("a[href='https://temasekproperties.com/listings/']").click()
+        if DriverData.mobile:
+            self.spnExpandMenu().click()
+            start_elem = self.driver.find_element_by_css_selector("nav[class='sh-header-mobile-dropdown']")
+        else:
+            start_elem = self.driver.find_element_by_id("header-navigation")
+        start_elem.find_elements_by_css_selector("a[href='https://temasekproperties.com/listings/']")[0].click()
 
     def go_to_resources_booked(self):
-        start_elem = self.driver.find_element_by_id("header-navigation") # for mobile: header-navigation-mobile
+        if DriverData.mobile:
+            self.spnExpandMenu().click()
+            start_elem = self.driver.find_element_by_id("header-navigation-mobile")
+        else:
+            start_elem = self.driver.find_element_by_id("header-navigation") # for mobile: header-navigation-mobile
         start_elem.find_element_by_id("menu-item-9408").click()
         time.sleep(2)
         wait_until(lambda: "block" in self.driver.find_element_by_id("header-navigation").find_element_by_id("menu-item-9408").find_element_by_tag_name("ul").get_attribute("style"))
@@ -48,7 +63,11 @@ class HomePage:
         self.log.screenshot("resource booked opened")
 
     def go_to_resources_booking(self):
-        start_elem = self.driver.find_element_by_id("header-navigation") # for mobile: header-navigation-mobile
+        if DriverData.mobile:
+            self.spnExpandMenu().click()
+            start_elem = self.driver.find_element_by_css_selector("ul[class='sh-nav-mobile']")
+        else:
+            start_elem = self.driver.find_element_by_id("header-navigation") # for mobile: header-navigation-mobile
         start_elem.find_element_by_id("menu-item-9408").click()
         time.sleep(2)
         wait_until(lambda: "block" in start_elem.find_element_by_id("menu-item-9408").find_element_by_tag_name("ul").get_attribute("style"))
