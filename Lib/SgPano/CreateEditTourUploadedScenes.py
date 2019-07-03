@@ -41,13 +41,15 @@ class UploadedScenesTour(CommonAction):
         for picture in scenes:
             for scene in foundScenes:
                 if scene.find_element_by_tag_name("p").text == picture.fileName:
-                    inputTitle = scene.find_element_by_id("scence-title")
+                    #inputTitle = scene.find_element_by_id("scence-title")
+                    inputTitle = scene.find_element_by_css_selector("input[id*='scence-title']")
                     inputTitle.send_keys(picture.title)
                     time.sleep(1)
                     break
         self.btnNext().click()
         wait_until(lambda: check_if_elem_exist(ConnectScenesTour(self.driver).btnHotSpot), timeout=30, period=2)
         self.log.screenshot("Button next executed")
+
 
     def delete_uploaded_scene(self, title):
         """
@@ -61,7 +63,7 @@ class UploadedScenesTour(CommonAction):
         uploadedScenes = self.driver.find_elements_by_css_selector("div[class^='scence-image col-lg-12']")
         foundScene = False
         for scene in uploadedScenes:
-            current_title = scene.find_element_by_id('scence-title').get_attribute("value")
+            current_title = scene.find_element_by_css_selector("input[id*='scence-title']").get_attribute("value")
             if current_title == title:
                 self.log.info("Delete scene with title={}".format(title))
                 scroll_element_to_center(self.driver, self.log, scene.find_element_by_css_selector("div[class='icon-delete']"))
@@ -90,7 +92,7 @@ class UploadedScenesTour(CommonAction):
         """
         self.log.info("Execute method get_uploaded_scenes")
         titles = []
-        scenes = self.driver.find_elements_by_id('scence-title')
+        scenes = self.driver.find_elements_by_css_selector('input[id*="scence-title"]')
         for scene in scenes:
             titles.append(scene.get_attribute('value'))
         self.log.info("Uploaded scenes are={}".format(titles))

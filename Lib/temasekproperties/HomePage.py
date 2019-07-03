@@ -47,6 +47,15 @@ class HomePage:
             start_elem = self.driver.find_element_by_id("header-navigation")
         start_elem.find_elements_by_css_selector("a[href='https://temasekproperties.com/listings/']")[0].click()
 
+    def go_to_listings_nfe(self):
+        wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("nav[id='header-navigation']")))
+        if DriverData.mobile:
+            self.spnExpandMenu().click()
+            start_elem = self.driver.find_element_by_css_selector("nav[class='sh-header-mobile-dropdown']")
+        else:
+            start_elem = self.driver.find_element_by_id("header-navigation")
+        start_elem.find_elements_by_css_selector("a[href='https://temasekproperties.com/listings-nfe/']")[0].click()
+#https://temasekproperties.com/listings-nfe/
     def go_to_resources_booked(self):
         if DriverData.mobile:
             self.spnExpandMenu().click()

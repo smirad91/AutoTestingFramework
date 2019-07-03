@@ -56,6 +56,9 @@ class ConnectScenesTour(CommonAction):
     def btnRighRotate(self):
         return self.driver.find_element_by_css_selector("img[src*='right-arrow.svg']")
 
+    def btnZoomOut(self):
+        return self.driver.find_element_by_css_selector("img[src*='minus.svg']")
+
     def btnLeftRotate(self):
         return self.driver.find_element_by_css_selector("img[src*='left-arrow.svg']")
 
@@ -326,6 +329,13 @@ class ConnectScenesTour(CommonAction):
         if hotSpotFound is None:
             raise Exception("HotSpot is not in center")
 
+
+    def zoom_out(self, number):
+        for i in range(number):
+            time.sleep(1)
+            self.btnZoomOut().click()
+            time.sleep(1)
+
     def rotate(self, right, clickNumber, useArrows):
         """
         Rotate scene to right or left clickNumber of times.
@@ -337,19 +347,20 @@ class ConnectScenesTour(CommonAction):
         """
         self.log.info("Execute method rotate with parameters right={}, clickNumber={}".format(right, clickNumber))
         if clickNumber != 0:
-            if useArrows:
+            if not useArrows:
                 for i in range(clickNumber):
-                    time.sleep(1.5)
+                    time.sleep(5)
                     ac = ActionChains(self.driver)
                     ac.move_to_element(self.tourImage())
                     ac.click_and_hold()
+                    moveFor = int(int(self.tourImage().size["width"])/58)
                     if right:
-                        ac.move_by_offset(-64, 0)
+                        ac.move_by_offset(moveFor*-1, 0)
                     else:
-                        ac.move_by_offset(64, 0)
+                        ac.move_by_offset(moveFor, 0)
                     ac.release()
                     ac.perform()
-                    time.sleep(1.5)
+                    time.sleep(5)
             else:
                 if right:
                     button = self.btnRighRotate
@@ -362,7 +373,7 @@ class ConnectScenesTour(CommonAction):
                     time.sleep(1.5)
         self.log.screenshot("Rotate is done")
 
-    def rotate_scene(self, pixels, width, useArrows=True):
+    def rotate_scene(self, pixels, width, useArrows=True, viewTour=False):
         """
         Width is full picture size. Pixels are inside of full width. This method will rotate scene
         so that pixels are on center of scene.
@@ -381,12 +392,16 @@ class ConnectScenesTour(CommonAction):
             #move left
             moveForPixels = width/2 - pixels
             numberRotate = int(moveForPixels/oneMove)
+            if viewTour:
+                numberRotate -=1
             self.rotate(False, numberRotate, useArrows)
             return False, numberRotate
         else:
             #move right
             moveForPixels = pixels - width/2
             numberRotate = int(moveForPixels/oneMove)
+            if viewTour:
+                numberRotate -=1
             self.rotate(True, numberRotate, useArrows)
             return True, numberRotate
 
@@ -426,6 +441,11 @@ class ConnectScenesTour(CommonAction):
         """
         self.driver.set_page_load_timeout(30)
         time.sleep(3)
+        try:
+            wait_until(lambda: "inline" in self.driver.find_element_by_css_selector(
+                "div[class='pnlm-load-box']").get_attribute('style'), timeout=10)
+        except:
+            pass
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_class_name("pnlm-render-container").find_element_by_tag_name("canvas")), timeout=60)
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("div[class='pnlm-load-box']")), timeout=30)
         wait_until(lambda: "inline" not in self.driver.find_element_by_css_selector("div[class='pnlm-load-box']").get_attribute('style'), timeout=60)
@@ -450,6 +470,8 @@ class ConnectScenesTour(CommonAction):
         self.log.info("Execute method insert_hotSpots with parameter scenes={}".format("".join(scenes.__repr__())))
         for scene in scenes:
             self.change_current_scene(scene.title)
+            self.rotate(True,1, True)
+            self.pan_to_view()
             for hotSpot in scene.hotSpots:
                 # self.add_button_to_center()
                 # self._set_hotSpot_goingTo(hotSpot.goingToScene)
@@ -462,7 +484,7 @@ class ConnectScenesTour(CommonAction):
                 #     time.sleep(3)
                 #     print("posle {}".format(hsCenter.location))
                 # time.sleep(1000)
-                self.rotate_scene(hotSpot.location, scene.width)
+                self.rotate_scene(hotSpot.location, scene.width, False)
                 self.add_button_to_center()
                 self._set_hotSpot_goingTo(hotSpot.goingToScene)
                 self.save_hotSpot()
