@@ -52,13 +52,22 @@ if ERRORLEVEL 1 pause
 
 python CreateTour.py --browser=Chrome --mobile=galaxyS9/S9+ --orientation=Portrait
 if ERRORLEVEL 1 pause
-::python ViewTour.py --browser=Chrome --mobile=galaxyS9/S9+ --orientation=Portrait
-::if ERRORLEVEL 1 pause
+python ViewTour.py --browser=Chrome --mobile=galaxyS9/S9+ --orientation=Portrait
+if ERRORLEVEL 1 pause
 python EditTour.py --browser=Chrome --mobile=galaxyS9/S9+ --orientation=Portrait
 if ERRORLEVEL 1 pause
 python RemoveTour.py --browser=Chrome --mobile=galaxyS9/S9+ --orientation=Portrait
 if ERRORLEVEL 1 pause
 
+
+python CreateTour.py --browser=Chrome --mobile=iPad --orientation=Portrait
+if ERRORLEVEL 1 pause
+python ViewTour.py --browser=Chrome --mobile=iPad --orientation=Portrait
+if ERRORLEVEL 1 pause
+python EditTour.py --browser=Chrome --mobile=iPad --orientation=Portrait
+if ERRORLEVEL 1 pause
+python RemoveTour.py --browser=Chrome --mobile=iPad --orientation=Portrait
+if ERRORLEVEL 1 pause
 
 
 

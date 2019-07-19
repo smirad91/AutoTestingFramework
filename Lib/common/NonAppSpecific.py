@@ -87,7 +87,7 @@ def check_if_elem_exist(func):
         return True
     except Exception as ex:
         print("false")
-        #print(ex)
+        print(ex)
         return False
 
 def click_on_element_intercepted(func):
