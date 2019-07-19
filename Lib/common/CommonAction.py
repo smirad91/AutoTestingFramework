@@ -13,7 +13,7 @@ from Lib.common.WaitAction import wait_until
 
 class CommonAction:
     def btnSignUp(self):
-        return self.driver.find_element_by_id("menu-main-menu").find_element_by_tag_name("a[href*='membership-levels']")
+        return self.driver.find_element_by_id("menu-main-menu").find_element_by_css_selector("a[href*='membership-levels']")
 
     def btnLogIn(self):
         return self.driver.find_element_by_id("menu-main-menu").find_element_by_css_selector("a[href*='wp-login']")

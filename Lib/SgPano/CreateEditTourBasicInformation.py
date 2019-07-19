@@ -33,7 +33,7 @@ class BasicInformationTour:
         return radio_btns.find_element_by_xpath("//span[contains(text(),'{}')]/preceding-sibling::input".format(answer))
 
     def btnSubmit(self):
-        return self.driver.find_element_by_id("submit")
+        return self.driver.find_element_by_id("btnSubmit")
 
     def check_insert_basic_info_successfully(self):
         try:

@@ -7,6 +7,7 @@ import sys
 from os import path
 import atexit
 import traceback
+from time import gmtime, strftime
 
 import pyautogui
 
@@ -62,6 +63,8 @@ class Log:
         :param msg: Message to log
         :type msg: str
         """
+        time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        msg = time + " -- " + msg
         logging.getLogger().info("<p>"+msg+"</p>")
 
     def screenshot(self, msg="", fullScreen=False):
@@ -71,6 +74,8 @@ class Log:
         :param msg: Message to log
         :type msg: str
         """
+        time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        msg = time + " -- " + msg
         screenshotName = str(Log.screenshotNumber) + ".png"
         picturePath = os.path.join(Log.testLogFolderPath, screenshotName)
         Log.screenshotNumber += 1

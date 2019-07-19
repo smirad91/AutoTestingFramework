@@ -18,16 +18,17 @@ li = LogIn(driver)
 li.log_in("testlist", "test123")
 
 hp = HomePage(driver)
-hp.go_to_listings()
+hp.go_to_listings_nfe()
 
 l = Listings(driver)
 l.open_listing_by_index(1)
 
 l.play()
-
-floor = 1
-while True:
-    if not l.choose_floor(floor):
-        break
-    l.moveListing(8)
-    floor += 1
+l.moveListing(8)
+# time.sleep(10000)
+# floor = 1
+# while True:
+#     if not l.choose_floor(floor):
+#         break
+#     l.moveListing(8)
+#     floor += 1

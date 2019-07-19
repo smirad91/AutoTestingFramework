@@ -4,7 +4,8 @@ from Lib.common.CommonAction import CommonAction
 from selenium.webdriver import ActionChains
 
 from Lib.common.Log import Log
-from Lib.common.NonAppSpecific import send_text, check_if_elem_exist, click_on_element_intercepted, wait_page_load
+from Lib.common.NonAppSpecific import send_text, check_if_elem_exist, click_on_element_intercepted, wait_page_load, \
+    scroll_element_to_center
 from Lib.common.WaitAction import wait_until
 
 
@@ -123,16 +124,28 @@ class Listings(CommonAction):
 
 
     def play(self):
+        time.sleep(5)
         self.driver.switch_to.frame(self.driver.find_element_by_id("frame_me"))
         time.sleep(5)
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("a[id='button-play']")), timeout=60)
-        self.aPlay().click()
+        interractable = True
+        while(interractable):
+            try:
+                self.aPlay().click()
+                interractable = False
+            except Exception as ex:
+                print(str(ex))
+                if "element not interactable" in str(ex):
+                    pass
+                interractable = False
 
         # ac = ActionChains(self.driver)
         # ac.click(self.aPlay())
         # ac.perform()
         #self.driver.execute_script("arguments[0].click();", self.aPlay())
         wait_until(lambda: "display: none;" in self.driver.find_element_by_id("gui-loading").get_attribute("style"), timeout=60)
+        time.sleep(20)
+        self.driver.find_element_by_tag_name("body").click()
 
     def moveListing(self, numberOfMoves, right=True):
         # for i in range(numberOfMoves):
@@ -150,6 +163,7 @@ class Listings(CommonAction):
         #     ac.perform()
         #     time.sleep(2)
         #     self.log.screenshot("nakon pomeranje")
+        scroll_element_to_center(self.driver, self.log, self.canvas())
         for i in range(numberOfMoves):
             time.sleep(6)
             ActionChains(self.driver).move_to_element(self.canvas()).perform()

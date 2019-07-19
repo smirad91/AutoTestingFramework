@@ -31,4 +31,4 @@ vt = ViewTour(driver)
 pictures_info = cl.get("picturesData")
 scenes = parse_to_scenes(pictures_info)
 
-vt.check_arrows(scenes)
+vt.check_arrows(scenes, True)

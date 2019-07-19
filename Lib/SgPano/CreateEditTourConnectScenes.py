@@ -3,6 +3,7 @@ Class for manipulating with page https://sgpano.com/connect-scenes/
 """
 
 import pyautogui
+from selenium_move_cursor.MouseActions import move_to_element_chrome
 from selenium.webdriver import ActionChains
 import time
 from Lib.common.CommonAction import CommonAction, get_hotSpots, move_mouse_to_element
@@ -50,11 +51,20 @@ class ConnectScenesTour(CommonAction):
     def btnMoveRight(self):
         return self.driver.find_element_by_css_selector("img[src*='right-arrow']")
 
+    def btnZoomOut(self):
+        return self.driver.find_element_by_css_selector("img[src*='minus.svg']")
+
     def tourImage(self):
         return self.driver.find_element_by_class_name("pnlm-dragfix")
 
     def btnRighRotate(self):
         return self.driver.find_element_by_css_selector("img[src*='right-arrow.svg']")
+
+    def btnUpRotate(self):
+        return self.driver.find_element_by_css_selector("img[src*='up-arrow.svg']")
+
+    def btnDownRotate(self):
+        return self.driver.find_element_by_css_selector("img[src*='down-arrow.svg']")
 
     def btnLeftRotate(self):
         return self.driver.find_element_by_css_selector("img[src*='left-arrow.svg']")
@@ -337,19 +347,35 @@ class ConnectScenesTour(CommonAction):
         """
         self.log.info("Execute method rotate with parameters right={}, clickNumber={}".format(right, clickNumber))
         if clickNumber != 0:
-            if useArrows:
-                for i in range(clickNumber):
-                    time.sleep(1.5)
-                    ac = ActionChains(self.driver)
-                    ac.move_to_element(self.tourImage())
-                    ac.click_and_hold()
-                    if right:
-                        ac.move_by_offset(-64, 0)
-                    else:
-                        ac.move_by_offset(64, 0)
-                    ac.release()
-                    ac.perform()
-                    time.sleep(1.5)
+            if not useArrows:
+                if DriverData.driverName == "Chrome" and DriverData.mobile is False:
+                    for i in range(clickNumber):
+                        time.sleep(5)
+                        move_to_element_chrome(self.driver, self.tourImage(), 100)
+                        pyautogui.mouseDown()
+                        #moveFor = int(int(self.tourImage().size["width"]) / 58)
+                        moveFor = int(int(self.tourImage().size["width"]) / 8)
+                        if right:
+                            pyautogui.moveRel(moveFor * -1, 0, 1)
+                        else:
+                            pyautogui.moveRel(moveFor, 0, 1)
+                        pyautogui.mouseUp()
+                        time.sleep(5)
+                else:
+                    for i in range(clickNumber):
+                        time.sleep(5)
+                        ac = ActionChains(self.driver)
+                        ac.move_to_element(self.tourImage())
+                        ac.click_and_hold()
+                        #moveFor = int(int(self.tourImage().size["width"])/58)
+                        moveFor = int(int(self.tourImage().size["width"]) / 8)
+                        if right:
+                            ac.move_by_offset(moveFor*-1, 0)
+                        else:
+                            ac.move_by_offset(moveFor, 0)
+                        ac.release()
+                        ac.perform()
+                        time.sleep(5)
             else:
                 if right:
                     button = self.btnRighRotate
@@ -362,7 +388,182 @@ class ConnectScenesTour(CommonAction):
                     time.sleep(1.5)
         self.log.screenshot("Rotate is done")
 
-    def rotate_scene(self, pixels, width, useArrows=True):
+    def rotate2(self, move, useArrows, view):
+        """
+        Rotate scene to right or left clickNumber of times.
+
+        :param move: List of strings where to move. Order is important. Example ["left:2","right:5","up:1","down:1"]
+        :type move: list
+        """
+        self.log.info("Execute method rotate with parameters move={}".format(move))
+        for move_to in move:
+            move_number = move_to.split(":")
+            move_where = move_number[0]
+            move_number = int(move_number[1])
+            if not view:
+                self.move(move_where, move_number, useArrows, view)
+            else:
+                self.view_tour(move_where, move_number)
+        self.log.screenshot("Rotate is done")
+
+    def view_tour(self, where, number):
+        if DriverData.mobile is True and "Firefox" in DriverData.driverName:
+            number = number*2
+        for i in range(number):
+            self.log.screenshot("iiii: ",i)
+            time.sleep(5)
+            moveForX = int(int(self.tourImage().size["width"]) / 8)
+            moveForY = int(int(self.tourImage().size["height"]) / 8)
+            ac = ActionChains(self.driver)
+            if not self._check_hotSpot_on_view():
+                self.log.screenshot("nije na centru")
+                ac.move_to_element(self.tourImage())
+            else:
+                if i != 0:
+                    break
+                ac.move_to_element(self.tourImage())
+            self.log.screenshot("nastavio posle brejk")
+            ac.click_and_hold()
+
+            if where == "right":
+                ac.move_by_offset(moveForX * -1, 0)
+            elif where == "left":
+                ac.move_by_offset(moveForX, 0)
+            elif where == "up":
+                ac.move_by_offset(0, moveForY * -1)
+            elif where == "down":
+                ac.move_by_offset(0, moveForY)
+            ac.release()
+            ac.perform()
+            time.sleep(5)
+            self.log.screenshot("prvi je pomeri na centar izvrsenoooooooooo jedno pomeranje")
+
+
+    def is_hs_on_center(self):
+        try:
+            for hotSpot in get_hotSpots(self.log, self.driver):
+                hotSpotLocation = hotSpot.get_attribute("style")
+                translate = hotSpotLocation.split("translate(")[1].split("px")[0]
+                hotSpotLocationWidth = int(translate.split(".")[0])
+                size = hotSpot.size
+                centerOfBrowser = self.driver.find_element_by_tag_name("body").size["width"]/2
+                self.log.info("Check if hotspot with x location={} is on center={}".format(hotSpotLocationWidth, centerOfBrowser))
+                if abs(self.tourImage().size["width"]/2 - hotSpotLocationWidth) <= 55:
+                    return True
+                #y check
+        except:
+            pass
+        return False
+
+    def _check_hotSpot_on_view(self):
+        """
+        Check if hotSpot is in center of view. And it shows to scene title=goingToScene. If hotSpot is not found
+        or hotSpot is not in center exception is raised.
+
+        :param goingToScene: Scene title that hotSpot should point
+        :type goingToScene: str
+        """
+        self.log.info("Execute method _check_hotSpot_on_view")
+        for hotSpot in get_hotSpots(self.log, self.driver):
+            try:
+                hotSpotLocation = hotSpot.get_attribute("style")
+                translate = hotSpotLocation.split("translate(")[1].split("px")[0]
+                hotSpotLocationWidth = int(translate.split(".")[0])
+                size = hotSpot.size
+                browserX = self.driver.find_element_by_tag_name("body").size["width"]
+                self.log.info("Check if hotspot with x location={} is on view={}".format(hotSpotLocationWidth, browserX))
+                if browserX - (hotSpotLocationWidth + size["width"]) > 0 and browserX - (hotSpotLocationWidth + size["width"]) < browserX:
+                    self.log.screenshot("Hotspot is on view")
+                    return True
+            except:
+                pass
+        return False
+
+
+    def move(self, where, number, useArrows, view):
+        if useArrows:
+            for i in range(number):
+                if where == "right":
+                    self.btnRighRotate().click()
+                elif where == "left":
+                    self.btnLeftRotate().click()
+                elif where == "up":
+                    self.btnDownRotate().click()
+                elif where == "down":
+                    self.btnLeftRotate().click()
+        else:
+            for i in range(number):
+                self.log.screenshot("iiii: ",i)
+                time.sleep(5)
+                # if DriverData.mobile is True and "Portrait" in DriverData.orientation:
+                #     moveForX = int(int(self.tourImage().size["width"]) / 4)
+                #     moveForY = int(int(self.tourImage().size["height"]) / 4)
+                # else:
+                moveForX = int(int(self.tourImage().size["width"]) / 8)
+                moveForY = int(int(self.tourImage().size["height"]) / 8)
+                # if DriverData.mobile and "Firefox" in DriverData.driverName and view:
+                #     moveForX = int(int(self.tourImage().size["width"]) / 2)
+                #     moveForY = int(int(self.tourImage().size["height"]) / 2)
+                ac = ActionChains(self.driver)
+                # if view:
+                #     check_hotspot = self._check_hotSpot_on_view
+                # else:
+                #     check_hotspot = self.is_hs_on_center
+                # if not check_hotspot():
+                #self.log.screenshot("nije na centru")
+                ac.move_to_element(self.tourImage())
+                # else:
+                #     if i == 0:
+                #         self.log.screenshot("prvi je pomeri na centar")
+                #         ac2 = ActionChains(self.driver)
+                #         ac2.move_to_element(self.tourImage())
+                #         ac2.perform()
+                #     else:
+                #         print("na centru zavrsilo se")
+                #         break
+                if DriverData.mobile:
+                    moveFor = 200
+                else:
+                    moveFor = 50
+                if where == "right":
+                    ac.move_by_offset(moveForX, 0)
+                elif where == "left":
+                    ac.move_by_offset(-moveForX, 0)
+                elif where == "up":
+                    ac.move_by_offset(0, moveForY)
+                elif where == "down":
+                    ac.move_by_offset(0, -moveForY)
+                ac.click_and_hold()
+
+                if where == "right":
+                    ac.move_by_offset(moveForX * -1, 0)
+                elif where == "left":
+                    ac.move_by_offset(moveForX, 0)
+                elif where == "up":
+                    ac.move_by_offset(0, moveForY * -1)
+                elif where == "down":
+                    ac.move_by_offset(0, moveForY)
+                ac.release()
+                ac.perform()
+                time.sleep(5)
+                self.log.screenshot("prvi je pomeri na centar izvrsenoooooooooo jedno pomeranje")
+
+
+    def get_number_rotate(self, pixels, width):
+        oneMove = int(width / 36)  # 36 is number of clicking on rotate for 360
+        if width / 2 > pixels:
+            # move left
+            moveForPixels = width / 2 - pixels
+            numberRotate = int(moveForPixels / oneMove)
+            return False, numberRotate
+        else:
+            # move right
+            moveForPixels = pixels - width / 2
+            numberRotate = int(moveForPixels / oneMove)
+            return True, numberRotate
+
+
+    def rotate_scene(self, pixels, width, useArrows=True, viewTour=False):
         """
         Width is full picture size. Pixels are inside of full width. This method will rotate scene
         so that pixels are on center of scene.
@@ -381,14 +582,19 @@ class ConnectScenesTour(CommonAction):
             #move left
             moveForPixels = width/2 - pixels
             numberRotate = int(moveForPixels/oneMove)
-            self.rotate(False, numberRotate, useArrows)
+            # if viewTour:
+            #     numberRotate -=1
+            self.rotate2(["left:{}".format(numberRotate)], useArrows, viewTour)
             return False, numberRotate
         else:
             #move right
             moveForPixels = pixels - width/2
             numberRotate = int(moveForPixels/oneMove)
-            self.rotate(True, numberRotate, useArrows)
+            # if viewTour:
+            #     numberRotate -=1
+            self.rotate2(["right:{}".format(numberRotate)], useArrows, viewTour)
             return True, numberRotate
+
 
     def save_hotSpot(self):
         """
@@ -450,6 +656,8 @@ class ConnectScenesTour(CommonAction):
         self.log.info("Execute method insert_hotSpots with parameter scenes={}".format("".join(scenes.__repr__())))
         for scene in scenes:
             self.change_current_scene(scene.title)
+            self.rotate(False, 1, True)
+            self.pan_to_view()
             for hotSpot in scene.hotSpots:
                 # self.add_button_to_center()
                 # self._set_hotSpot_goingTo(hotSpot.goingToScene)
@@ -462,7 +670,7 @@ class ConnectScenesTour(CommonAction):
                 #     time.sleep(3)
                 #     print("posle {}".format(hsCenter.location))
                 # time.sleep(1000)
-                self.rotate_scene(hotSpot.location, scene.width)
+                self.rotate_scene(hotSpot.location, scene.width, False)
                 self.add_button_to_center()
                 self._set_hotSpot_goingTo(hotSpot.goingToScene)
                 self.save_hotSpot()

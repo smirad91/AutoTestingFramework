@@ -23,6 +23,9 @@ class EditScenes:
     def divScenes(self):
         return self.driver.find_elements_by_css_selector("div[class='col-lg-4 col-md-4 col-xs-12 col-sm-12']")
 
+    def tourImage(self):
+        return self.driver.find_element_by_class_name("pnlm-dragfix")
+
     def get_number_of_scenes(self):
         """
         Get number of scenes
@@ -110,6 +113,8 @@ class EditScenes:
                     break
                 except:
                     pass
+            self.driver.refresh()
+
 
 
     def edit_tour(self, name):
@@ -123,6 +128,7 @@ class EditScenes:
         scene = self.find_scene_by_name(name)
         if scene:
             #scene.find_element_by_css_selector("a[title='Edit']").click()
-            scene.find_element_by_css_selector("a[title='Edit']").find_element_by_tag_name("i").click()
+            print(scene.find_elements_by_css_selector("a[title='Edit']")[1].get_attribute("href"))
+            scene.find_elements_by_css_selector("a[title='Edit']")[1].find_element_by_tag_name("i").click()
             time.sleep(2)
             self.log.info("Scene found and clicked on edit button")
