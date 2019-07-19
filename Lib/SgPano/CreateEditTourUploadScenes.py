@@ -122,6 +122,7 @@ class UploadScenesTour(CommonAction):
         elif DriverData.driverName == "Chrome":
             dialog_name = "Open"
         app = Application().connect(title=dialog_name)
+        time.sleep(3)
         app.Dialog.ComboBoxEx.Edit.type_keys(imgs)
         self.log.screenshot("Entered path to images", True)
         time.sleep(10)

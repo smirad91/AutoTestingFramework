@@ -58,6 +58,9 @@ log.info("Add, edit and delete info button")
 # cs.delete_hotSpotOrInfo_center()
 
 log.info("Add, edit going to, go to and delete hotSpot button")
+cs.rotate(True, 1, True)
+cs.rotate(False, 1, True)
+cs.pan_to_view()
 cs.add_button_to_center()
 cs.choose_arrow(1)
 cs.save_hotSpot()
@@ -76,7 +79,7 @@ log.info("Insert defined hotSpots")
 if not createDriver.driverName == "Safari":
     cs.insert_hotSpots(scenes)
 
-cs.choose_theme(4)
+#cs.choose_theme(4)
 
 #uncomment when bug is resolved
 #cs.delete_hotSpot(pictures[0], pictures[0].hotSpots[0].location)

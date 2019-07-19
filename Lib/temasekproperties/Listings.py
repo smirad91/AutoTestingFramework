@@ -124,7 +124,6 @@ class Listings(CommonAction):
 
 
     def play(self):
-        time.sleep(5)
         self.driver.switch_to.frame(self.driver.find_element_by_id("frame_me"))
         time.sleep(5)
         wait_until(lambda: check_if_elem_exist(lambda: self.driver.find_element_by_css_selector("a[id='button-play']")), timeout=60)
@@ -134,7 +133,7 @@ class Listings(CommonAction):
                 self.aPlay().click()
                 interractable = False
             except Exception as ex:
-                print(str(ex))
+                #print(str(ex))
                 if "element not interactable" in str(ex):
                     pass
                 interractable = False
