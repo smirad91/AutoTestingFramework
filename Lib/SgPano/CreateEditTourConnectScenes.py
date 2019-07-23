@@ -314,7 +314,7 @@ class ConnectScenesTour(CommonAction):
         self.btnSaveInfo().click()
         time.sleep(3)
 
-    def get_hotspot_from_center(self):
+    def get_hotspot_from_center(self, center=True):
         """
         Return hotspot if on center or raise exception
         """
@@ -327,7 +327,31 @@ class ConnectScenesTour(CommonAction):
                 size = hotSpot.size
                 tourSceneCenter = self.tourImage().size["width"]/2
                 self.log.info("Check if hotspot with x location={} is on center={}".format(hotSpotLocationWidth, tourSceneCenter))
-                if abs(abs(hotSpotLocationWidth + size["width"]/2) - tourSceneCenter) <= 20:  #allowed error of 20 pixels
+                limit = 50
+                if (hotSpotLocationWidth > tourSceneCenter-limit and hotSpotLocationWidth< tourSceneCenter+limit):  #allowed error of 50 pixels
+                    self.log.screenshot("Hotspot is in center")
+                    hotSpotFound = hotSpot
+                    return hotSpot
+            except Exception as ex:
+                self.log.info(str(ex))
+        if hotSpotFound is None:
+            raise Exception("HotSpot is not in center")
+
+    def get_hotspot_closer_to_center(self, center=True):
+        """
+        Return hotspot if on center or raise exception
+        """
+        hotSpotFound = None
+        for hotSpot in get_hotSpots(self.log, self.driver):
+            try:
+                hotSpotLocation = hotSpot.get_attribute("style")
+                translate = hotSpotLocation.split("translate(")[1].split("px")[0]
+                hotSpotLocationWidth = int(translate.split(".")[0])
+                size = hotSpot.size
+                tourSceneCenter = self.tourImage().size["width"]/2
+                self.log.info("Check if hotspot with x location={} is on center={}".format(hotSpotLocationWidth, tourSceneCenter))
+                limit = 50
+                if (hotSpotLocationWidth > tourSceneCenter-limit and hotSpotLocationWidth< tourSceneCenter+limit):  #allowed error of 50 pixels
                     self.log.screenshot("Hotspot is in center")
                     hotSpotFound = hotSpot
                     return hotSpot
@@ -395,7 +419,7 @@ class ConnectScenesTour(CommonAction):
         :param move: List of strings where to move. Order is important. Example ["left:2","right:5","up:1","down:1"]
         :type move: list
         """
-        self.log.info("Execute method rotate with parameters move={}".format(move))
+        self.log.info("Execute method rotate with parametersssssssss move={}".format(move))
         for move_to in move:
             move_number = move_to.split(":")
             move_where = move_number[0]
@@ -406,12 +430,34 @@ class ConnectScenesTour(CommonAction):
                 self.view_tour(move_where, move_number)
         self.log.screenshot("Rotate is done")
 
+    def where_to_move_edit_and_view(self):
+        self.log.info("Execute method _check_hotSpot_on_view")
+        for hotSpot in get_hotSpots(self.log, self.driver):
+            try:
+                hotSpotLocation = hotSpot.get_attribute("style")
+                translate = hotSpotLocation.split("translate(")[1].split("px")[0]
+                hotSpotLocationWidth = int(translate.split(".")[0])
+                size = hotSpot.size
+                browserX = self.tourImage().size["width"]
+                self.log.info("Check if hotspot with x location={} is on view={}".format(hotSpotLocationWidth, browserX))
+                if hotSpotLocationWidth>0 and browserX / 2 > hotSpotLocationWidth - 125 and browserX / 2 > hotSpotLocationWidth + 175:
+                    self.log.screenshot("Hotspot is on center")
+                    return (abs(int(hotSpotLocationWidth - 125 - browserX / 2)),
+                            abs(int(hotSpotLocationWidth + 175 - browserX / 2)))  # desno, levo
+
+                # if browserX/2 > hotSpotLocationWidth-125 and browserX/2 > hotSpotLocationWidth+175:
+                #     self.log.screenshot("Hotspot is on center")
+                #     return (abs(int(hotSpotLocationWidth-125-browserX/2)), abs(int(hotSpotLocationWidth+175-browserX/2)))#desno, levo
+            except:
+                pass
+        return (0,0)
+
     def view_tour(self, where, number):
-        if DriverData.mobile is True and "Firefox" in DriverData.driverName:
-            number = number*2
+        #if DriverData.mobile is True and "Portrait" in DriverData.orientation:
+        number = number*2
         for i in range(number):
-            self.log.screenshot("iiii: ",i)
-            time.sleep(5)
+            self.log.screenshot("iiii: {}".format(i))
+            time.sleep(2)
             moveForX = int(int(self.tourImage().size["width"]) / 8)
             moveForY = int(int(self.tourImage().size["height"]) / 8)
             ac = ActionChains(self.driver)
@@ -419,9 +465,22 @@ class ConnectScenesTour(CommonAction):
                 self.log.screenshot("nije na centru")
                 ac.move_to_element(self.tourImage())
             else:
-                if i != 0:
+                if i == 0:
+                    ac.move_to_element(self.tourImage())
+                    self.log.info("pomeri za 5 dole")
+                    hs_loc = self.where_to_move_edit_and_view()
+                    print(hs_loc)
+                    print(hs_loc[0])
+                    print(type(hs_loc))
+                    print(type(hs_loc[0]))
+                    if where =="right":
+                        ac.move_by_offset(-1 * hs_loc[0],0)
+                    elif where == "left":
+                        ac.move_by_offset(hs_loc[1], 0)
+                else:
                     break
-                ac.move_to_element(self.tourImage())
+            # if self.get_hotspot_location():
+            #     ac.move_by_offset()
             self.log.screenshot("nastavio posle brejk")
             ac.click_and_hold()
 
@@ -435,7 +494,7 @@ class ConnectScenesTour(CommonAction):
                 ac.move_by_offset(0, moveForY)
             ac.release()
             ac.perform()
-            time.sleep(5)
+            time.sleep(2)
             self.log.screenshot("prvi je pomeri na centar izvrsenoooooooooo jedno pomeranje")
 
 
@@ -470,9 +529,11 @@ class ConnectScenesTour(CommonAction):
                 translate = hotSpotLocation.split("translate(")[1].split("px")[0]
                 hotSpotLocationWidth = int(translate.split(".")[0])
                 size = hotSpot.size
-                browserX = self.driver.find_element_by_tag_name("body").size["width"]
+                #browserX = self.driver.find_element_by_tag_name("body").size["width"]
+                browserX = self.tourImage().size["width"]
                 self.log.info("Check if hotspot with x location={} is on view={}".format(hotSpotLocationWidth, browserX))
-                if browserX - (hotSpotLocationWidth + size["width"]) > 0 and browserX - (hotSpotLocationWidth + size["width"]) < browserX:
+                #if browserX - (hotSpotLocationWidth + size["width"]) > 0 and browserX - (hotSpotLocationWidth + size["width"]) < browserX:
+                if hotSpotLocationWidth >= 0 and hotSpotLocationWidth <= browserX:
                     self.log.screenshot("Hotspot is on view")
                     return True
             except:
@@ -494,59 +555,36 @@ class ConnectScenesTour(CommonAction):
         else:
             for i in range(number):
                 self.log.screenshot("iiii: ",i)
-                time.sleep(5)
-                # if DriverData.mobile is True and "Portrait" in DriverData.orientation:
-                #     moveForX = int(int(self.tourImage().size["width"]) / 4)
-                #     moveForY = int(int(self.tourImage().size["height"]) / 4)
-                # else:
+                time.sleep(2)
                 moveForX = int(int(self.tourImage().size["width"]) / 8)
                 moveForY = int(int(self.tourImage().size["height"]) / 8)
-                # if DriverData.mobile and "Firefox" in DriverData.driverName and view:
-                #     moveForX = int(int(self.tourImage().size["width"]) / 2)
-                #     moveForY = int(int(self.tourImage().size["height"]) / 2)
-                ac = ActionChains(self.driver)
-                # if view:
-                #     check_hotspot = self._check_hotSpot_on_view
-                # else:
-                #     check_hotspot = self.is_hs_on_center
-                # if not check_hotspot():
-                #self.log.screenshot("nije na centru")
-                ac.move_to_element(self.tourImage())
-                # else:
-                #     if i == 0:
-                #         self.log.screenshot("prvi je pomeri na centar")
-                #         ac2 = ActionChains(self.driver)
-                #         ac2.move_to_element(self.tourImage())
-                #         ac2.perform()
-                #     else:
-                #         print("na centru zavrsilo se")
-                #         break
-                if DriverData.mobile:
-                    moveFor = 200
-                else:
-                    moveFor = 50
-                if where == "right":
-                    ac.move_by_offset(moveForX, 0)
-                elif where == "left":
-                    ac.move_by_offset(-moveForX, 0)
-                elif where == "up":
-                    ac.move_by_offset(0, moveForY)
-                elif where == "down":
-                    ac.move_by_offset(0, -moveForY)
-                ac.click_and_hold()
+                try:
+                    self.get_hotspot_from_center()
+                except:
+                    ac = ActionChains(self.driver)
+                    ac.move_to_element(self.tourImage())
+                    if where == "right":
+                        ac.move_by_offset(moveForX, 0)
+                    elif where == "left":
+                        ac.move_by_offset(-moveForX, 0)
+                    elif where == "up":
+                        ac.move_by_offset(0, moveForY)
+                    elif where == "down":
+                        ac.move_by_offset(0, -moveForY)
+                    ac.click_and_hold()
 
-                if where == "right":
-                    ac.move_by_offset(moveForX * -1, 0)
-                elif where == "left":
-                    ac.move_by_offset(moveForX, 0)
-                elif where == "up":
-                    ac.move_by_offset(0, moveForY * -1)
-                elif where == "down":
-                    ac.move_by_offset(0, moveForY)
-                ac.release()
-                ac.perform()
-                time.sleep(5)
-                self.log.screenshot("prvi je pomeri na centar izvrsenoooooooooo jedno pomeranje")
+                    if where == "right":
+                        ac.move_by_offset(moveForX * -1, 0)
+                    elif where == "left":
+                        ac.move_by_offset(moveForX, 0)
+                    elif where == "up":
+                        ac.move_by_offset(0, moveForY * -1)
+                    elif where == "down":
+                        ac.move_by_offset(0, moveForY)
+                    ac.release()
+                    ac.perform()
+                    time.sleep(2)
+                    self.log.screenshot("prvi je pomeri na centar izvrsenoooooooooo jedno pomeranje")
 
 
     def get_number_rotate(self, pixels, width):
@@ -563,7 +601,7 @@ class ConnectScenesTour(CommonAction):
             return True, numberRotate
 
 
-    def rotate_scene(self, pixels, width, useArrows=True, viewTour=False):
+    def rotate_scene(self, pixels, width, useArrows=True, viewTour=False, up=False, down=False):
         """
         Width is full picture size. Pixels are inside of full width. This method will rotate scene
         so that pixels are on center of scene.
@@ -582,17 +620,24 @@ class ConnectScenesTour(CommonAction):
             #move left
             moveForPixels = width/2 - pixels
             numberRotate = int(moveForPixels/oneMove)
-            # if viewTour:
-            #     numberRotate -=1
-            self.rotate2(["left:{}".format(numberRotate)], useArrows, viewTour)
+            rotate = ["left:{}".format(numberRotate)]
+            if up:
+                rotate.append("up:1")
+            elif down:
+                rotate.append("down:3")
+            print(rotate)
+            self.rotate2(rotate, useArrows, viewTour)
             return False, numberRotate
         else:
             #move right
             moveForPixels = pixels - width/2
             numberRotate = int(moveForPixels/oneMove)
-            # if viewTour:
-            #     numberRotate -=1
-            self.rotate2(["right:{}".format(numberRotate)], useArrows, viewTour)
+            rotate = ["right:{}".format(numberRotate)]
+            if up:
+                rotate.append("up:1")
+            elif down:
+                rotate.append("down:3")
+            self.rotate2(rotate, useArrows, viewTour)
             return True, numberRotate
 
 
@@ -646,6 +691,10 @@ class ConnectScenesTour(CommonAction):
         #self.click_on_element(self.btnPanToView)
         time.sleep(3)
 
+    def stop_rotate(self):
+        self.rotate(False, 1, True)
+        self.pan_to_view()
+
     def insert_hotSpots(self, scenes):
         """
         Insert hotSpots that are defined in scenes
@@ -656,8 +705,7 @@ class ConnectScenesTour(CommonAction):
         self.log.info("Execute method insert_hotSpots with parameter scenes={}".format("".join(scenes.__repr__())))
         for scene in scenes:
             self.change_current_scene(scene.title)
-            self.rotate(False, 1, True)
-            self.pan_to_view()
+            self.stop_rotate()
             for hotSpot in scene.hotSpots:
                 # self.add_button_to_center()
                 # self._set_hotSpot_goingTo(hotSpot.goingToScene)
@@ -670,7 +718,7 @@ class ConnectScenesTour(CommonAction):
                 #     time.sleep(3)
                 #     print("posle {}".format(hsCenter.location))
                 # time.sleep(1000)
-                self.rotate_scene(hotSpot.location, scene.width, False)
+                self.rotate_scene(hotSpot.location, scene.width, useArrows=False, up=hotSpot.up, down=hotSpot.down)
                 self.add_button_to_center()
                 self._set_hotSpot_goingTo(hotSpot.goingToScene)
                 self.save_hotSpot()
@@ -700,7 +748,7 @@ class ConnectScenesTour(CommonAction):
         ac.release()
         ac.perform()
 
-    def delete_hotSpot(self, scene, hotSpotLocation):
+    def delete_hotSpot(self, scene, hotSpotLocation, center=True):
         """
         Delete hotSpot from scene where location is hotSpotLocation.
 
@@ -712,8 +760,9 @@ class ConnectScenesTour(CommonAction):
         self.log.info("Execute method delete_hotSpot with parameter scene={}, "
                       "hotSpotLocation={}".format(scene, hotSpotLocation))
         self.change_current_scene(scene.title)
-        self.rotate_scene(hotSpotLocation, scene.width)
-        self.delete_hotSpotOrInfo_center()
+        self.stop_rotate()
+        self.rotate_scene(hotSpotLocation, scene.width, False)
+        self.delete_hotSpotOrInfo_center(True)
 
     def _set_hotSpot_goingTo(self, title):
         """
@@ -737,9 +786,42 @@ class ConnectScenesTour(CommonAction):
         """
         Open menu of button in center of tour
         """
+        time.sleep(5)
         self.get_hotspot_from_center().click()
         wait_until(lambda: check_if_elem_exist(self.btnDeleteHotSpot), timeout=10)
         self.log.screenshot("Clicked on hotspot")
+
+    def open_menu_hotSpotOrInfo_on_view(self):
+        """
+        Open menu of button in center of tour
+        """
+        time.sleep(5)
+        hotSpotFound = None
+        for hotSpot in get_hotSpots(self.log, self.driver):
+            try:
+                hotSpotLocation = hotSpot.get_attribute("style")
+                translate = hotSpotLocation.split("translate(")[1].split("px")[0]
+                hotSpotLocationWidth = int(translate.split(".")[0])
+                size = hotSpot.size
+                tourSceneSize = self.tourImage().size["width"]
+                self.log.info(
+                    "Check if hotspot with x location={} is on view={}".format(hotSpotLocationWidth, tourSceneSize))
+                limit = 50
+                # if abs(abs(hotSpotLocationWidth + size["width"]/2) - tourSceneCenter) <= tourSceneCenter/2 and hotSpotLocationWidth>=0:  #allowed error of 20 pixels
+                #     self.log.screenshot("Hotspot is in center")
+                #     hotSpotFound = hotSpot
+                #     return hotSpot
+                if hotSpotLocationWidth >= 0 and hotSpotLocationWidth <= tourSceneSize:
+                    self.log.screenshot("Hotspot is on view")
+                    hotSpotFound = hotSpot
+                    hotSpot.click()
+            except Exception as ex:
+                self.log.info(str(ex))
+        if hotSpotFound is None:
+            raise Exception("HotSpot is not in center")
+        wait_until(lambda: check_if_elem_exist(self.btnDeleteHotSpot), timeout=10)
+        self.log.screenshot("Clicked on hotspot")
+
 
     def edit_hotSpot_center(self):
         """"
@@ -832,13 +914,16 @@ class ConnectScenesTour(CommonAction):
 
 
 
-    def delete_hotSpotOrInfo_center(self):
+    def delete_hotSpotOrInfo_center(self, center=True):
         """
         Delete hotSpot or info, depending what is on center of tour
         """
         self.log.info("Execute method delete_hotSpotOrInfo_center")
         time.sleep(1)
-        self.open_menu_hotSpotOrInfo_center()
+        if center:
+            self.open_menu_hotSpotOrInfo_center()
+        else:
+            self.open_menu_hotSpotOrInfo_on_view()
         self.log.screenshot("Click on delete hotspot")
         self.btnDeleteHotSpot().click()
         time.sleep(1)

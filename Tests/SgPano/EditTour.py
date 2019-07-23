@@ -1,3 +1,5 @@
+import time
+
 from Lib.SgPano.CreateEditTourBasicInformation import BasicInformationTour
 from Lib.SgPano.CreateEditTourConnectScenes import ConnectScenesTour
 from Lib.SgPano.CreateEditTourUploadScenes import UploadScenesTour
@@ -52,15 +54,15 @@ else:
 
 cs = ConnectScenesTour(driver)
 log.info("Add, edit and delete info button")
-#when bug is resolved, uncomment
-# cs.add_info_button_center("title", "name", "https://sgpano.com/")
-# cs.edit_info_button_center("edited title", "edited name", "edited url")
-# cs.delete_hotSpotOrInfo_center()
+#when bug for adding info button in mobile mode is resolved, remove if
+if not DriverData.mobile:
+    cs.stop_rotate()
+    cs.add_info_button_center("title", "name", "https://sgpano.com/")
+    cs.edit_info_button_center("edited title", "edited name", "edited url")
+    cs.delete_hotSpotOrInfo_center()
 
 log.info("Add, edit going to, go to and delete hotSpot button")
-cs.rotate(True, 1, True)
-cs.rotate(False, 1, True)
-cs.pan_to_view()
+cs.stop_rotate()
 cs.add_button_to_center()
 cs.choose_arrow(1)
 cs.save_hotSpot()
@@ -72,16 +74,16 @@ cs.save_edited_hotSpot()
 cs.goTo_hotSpot_center()
 
 cs.change_current_scene("First picture")
-#uncomment when bug is resolved
-#cs.delete_hotSpotOrInfo_center()
+cs.stop_rotate()
+#uncomment when bug above is resolved
+if not DriverData.mobile:
+    cs.delete_hotSpotOrInfo_center()
 
 log.info("Insert defined hotSpots")
 if not createDriver.driverName == "Safari":
     cs.insert_hotSpots(scenes)
 
-#cs.choose_theme(4)
-
-#uncomment when bug is resolved
-#cs.delete_hotSpot(pictures[0], pictures[0].hotSpots[0].location)
+cs.choose_theme(4)
+#cs.delete_hotSpot(pictures[0], pictures[0].hotSpots[1].location, False)
 
 cs.publish()

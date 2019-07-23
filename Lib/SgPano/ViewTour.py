@@ -121,7 +121,8 @@ class ViewTour:
                 size = hotSpot.size
                 browserX = self.driver.find_element_by_tag_name("body").size["width"]
                 self.log.info("Check if hotspot with x location={} is on view={}".format(hotSpotLocationWidth, browserX))
-                if browserX - (hotSpotLocationWidth + size["width"]) > 0:
+                #if browserX - (hotSpotLocationWidth + size["width"]) > 0:
+                if hotSpotLocationWidth>=0 and hotSpotLocationWidth<self.tourImage().size["width"]:
                     self.log.screenshot("Hotspot is on view")
                     return True
             except Exception as ex:
@@ -173,7 +174,14 @@ class ViewTour:
                     where2 = "left"
                 if i < len(scene.hotSpots)-1:
                     self.log.screenshot("***pocinje rotate drugi")
-                    cst.rotate2(["{}:{}".format(where2, number_rotate[1])], False, view)
+                    rotate = []
+                    if not view:
+                        if hotSpot.up:
+                            rotate.append("down:1")
+                        if hotSpot.down:
+                            rotate.append("up:3")
+                    rotate.append("{}:{}".format(where2, number_rotate[1]))
+                    cst.rotate2(rotate, False, view)
                     self.log.screenshot("***zavrsen rotate drugi")
                 #     print(1)
                 #     if rotateInfo[1] > 1:

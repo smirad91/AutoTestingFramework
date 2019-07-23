@@ -11,13 +11,13 @@
   "facebookEmail": "email",
   "facebookPass": "pass",
 
-  "usernameTrial": "smirafcccd92",
+  "usernameTrial": "smirafcccd922",
   "passwordTrial": "Kjdld2019#",
-  "emailTrial": "smirfad9ccc1@gmail.com",
+  "emailTrial": "smirfad92ccc1@gmail.com",
 
-  "usernameBasic": "ffgffygjghjff",
+  "usernameBasic": "testusername",
   "passwordBasic": "fhfyffgggfjjffff#",
-  "emailBasic": "55f5ggfyhg5jjf465@gmail.com",
+  "emailBasic": "testusername@gmail.com",
 
   "tourName": "My first tour",
   "tourAddress": "My address",
@@ -26,8 +26,8 @@
   "picturesData": {
                 "path":"Tour1",
                 "scenes": [
-                {"fileName":"first.jpg", "title":"First picture", "hotSpots":["Second picture:2717", "Third picture:937"]},
-                {"fileName":"second.jpg", "title":"Second picture","hotSpots":["Third picture:501", "First picture:299"]},
+                {"fileName":"first.jpg", "title":"First picture", "hotSpots":["Second picture:2717:up", "Third picture:937"]},
+                {"fileName":"second.jpg", "title":"Second picture","hotSpots":["Third picture:501", "First picture:299:down"]},
                 {"fileName":"Foto.jpg", "title":"Third picture", "hotSpots":["First picture:397"]}
                 ]
   },

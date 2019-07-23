@@ -38,10 +38,14 @@ class CommonAction:
         return self.driver.find_element_by_css_selector("input[id='password']")
 
     def btnLogInPayPal(self):
+        return self.driver.find_element_by_css_selector("a[ng-click*='logWebviewLoginClickWrapper()']")
+
+    def btnLogInPayPal2(self):
         return self.driver.find_element_by_css_selector("button[id='btnLogin']")
 
+
     def btnContinuePayPal(self):
-        return self.driver.find_element_by_css_selector("button[track-submit='choose_FI_interstitial']")
+        return self.driver.find_element_by_css_selector("button[id='btnNext']")
 
     def btnPayNow(self):
         return self.driver.find_element_by_css_selector("input[value='Pay Now']")
@@ -53,19 +57,24 @@ class CommonAction:
     def pay_pal(self, payPalEmail, payPalPassword, timeout):
         self.wait_paypal_opened(timeout)
         self.log.info("Add PayPal credentials")
-        wait_until(lambda: check_if_elem_exist(self.inpPayPalEmail), timeout=timeout)
-        send_text(self.inpPayPalEmail(), payPalEmail, mode="update")
-        send_text(self.inpPayPalPass(), payPalPassword, mode="update")
-        self.log.screenshot("Credentials for PayPal are entered")
-        self.btnLogInPayPal().click()
-        wait_until(lambda: check_if_elem_exist(self.btnContinuePayPal), timeout=timeout)
-        self.log.screenshot("Click on continue")
         time.sleep(5)
-        wait_until(lambda: click_on_element_intercepted(self.btnContinuePayPal), timeout=timeout)
-        wait_until(lambda: check_if_elem_exist(self.btnPayNow), timeout=timeout)
+        wait_until(lambda: check_if_elem_exist(self.btnLogInPayPal), timeout=timeout)
+        self.btnLogInPayPal().click()
+        wait_until(lambda: check_if_elem_exist(self.inpPayPalEmail), timeout=timeout)
+        wait_until(lambda: check_if_elem_exist(self.btnContinuePayPal), timeout=timeout)
+        send_text(self.inpPayPalEmail(), payPalEmail, mode="update")
+        self.log.screenshot("Credentials for PayPal are entered")
+        self.log.info("Click on continue")
+        self.btnContinuePayPal().click()
+        time.sleep(5)
+        wait_until(lambda: check_if_elem_exist(self.inpPayPalPass), timeout=timeout)
+        send_text(self.inpPayPalPass(), payPalPassword, mode="update")
+        # wait_until(lambda: click_on_element_intercepted(self.btnContinuePayPal), timeout=timeout)
+        # wait_until(lambda: check_if_elem_exist(self.btnPayNow), timeout=timeout)
         self.log.screenshot("Click on pay now")
-        #self.btnPayNow().click()
+        self.btnLogInPayPal2().click()
         self.log.screenshot("Paid")
+
 
     def click_on_element(self, func):
         """

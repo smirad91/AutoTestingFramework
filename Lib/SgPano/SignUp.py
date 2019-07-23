@@ -56,11 +56,11 @@ class SignUp(CommonAction):
     def inpPayPalPass(self):
         return self.driver.find_element_by_css_selector("input[id='password']")
 
-    def btnLogInPayPal(self):
-        return self.driver.find_element_by_css_selector("button[id='btnLogin']")
+    # def btnLogInPayPal(self):
+    #     return self.driver.find_element_by_css_selector("button[id='btnLogin']")
 
-    def btnContinuePayPal(self):
-        return self.driver.find_element_by_css_selector("button[track-submit='choose_FI_interstitial']")
+    # def btnContinuePayPal(self):
+    #     return self.driver.find_element_by_css_selector("button[track-submit='choose_FI_interstitial']")
 
     def btnPayNow(self):
         return self.driver.find_element_by_css_selector("input[value='Pay Now']")

@@ -51,9 +51,16 @@ def parse_to_scenes(scenes_info):
         hotSpots = []
         for hotSpot in pic["hotSpots"]:
             hotSpotInfo = hotSpot.split(":")
+            up = False
+            down = False
+            if len(hotSpotInfo) == 3:
+                if "up" in hotSpotInfo[2]:
+                    up = True
+                else:
+                    down = True
             goingToScene = hotSpotInfo[0]
             location = int(hotSpotInfo[1])
-            hotSpots.append(HotSpot(location, goingToScene))
+            hotSpots.append(HotSpot(location, goingToScene, up, down))
 
         pictureWidth = Image.open(get_images_path(scenes_info["path"] + "/"+ pic["fileName"])).size[0]
         picturePath = scenes_info["path"] + "\\" + pic["fileName"]

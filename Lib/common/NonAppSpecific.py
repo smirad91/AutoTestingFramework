@@ -4,7 +4,7 @@ Methods that can be used for every site.
 import os
 import sys
 import time
-
+import json
 import pyautogui
 from selenium import webdriver
 from selenium.common.exceptions import MoveTargetOutOfBoundsException, ElementClickInterceptedException
@@ -70,6 +70,18 @@ def get_location(driver, element):
     location = driver.execute_script("return arguments[0].getBoundingClientRect()", element)
     driver.execute_script("scroll(0,{})".format(before))
     return location
+
+def getConfigurationPath():
+    return os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                       os.pardir, os.pardir, "Configuration"))
+
+def change_config_username_pass_value(value, file='SgPano\\test.json'):
+    with open(os.path.join(getConfigurationPath(), file), 'r+') as f:
+        data = json.load(f)
+        data['configuration']['payPalEmail'] = value  # <--- add `id` value.
+        f.seek(0)  # <--- should reset file position to the beginning.
+        json.dump(data, f, indent=4)
+        f.truncate()
 
 
 def check_if_elem_exist(func):
