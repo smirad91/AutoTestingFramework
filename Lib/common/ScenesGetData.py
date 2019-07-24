@@ -50,14 +50,16 @@ def parse_to_scenes(scenes_info):
     for pic in scenes_info["scenes"]:
         hotSpots = []
         for hotSpot in pic["hotSpots"]:
-            hotSpotInfo = hotSpot.split(":")
-            up = False
-            down = False
-            if len(hotSpotInfo) == 3:
-                if "up" in hotSpotInfo[2]:
-                    up = True
+            hs = hotSpot.split(";")
+            hotSpotInfo = hs[0].split(":")
+            up=0
+            down=0
+            if len(hs) == 2:
+                hotSpotUpOrDown = hs[1].split(":")
+                if "up" in hotSpotUpOrDown[0]:
+                    up = hotSpotUpOrDown[1]
                 else:
-                    down = True
+                    down = hotSpotUpOrDown[1]
             goingToScene = hotSpotInfo[0]
             location = int(hotSpotInfo[1])
             hotSpots.append(HotSpot(location, goingToScene, up, down))

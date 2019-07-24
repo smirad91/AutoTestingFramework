@@ -621,10 +621,10 @@ class ConnectScenesTour(CommonAction):
             moveForPixels = width/2 - pixels
             numberRotate = int(moveForPixels/oneMove)
             rotate = ["left:{}".format(numberRotate)]
-            if up:
-                rotate.append("up:1")
+            if up!=0:
+                rotate.append("up:{}".format(up))
             elif down:
-                rotate.append("down:3")
+                rotate.append("down:{}".format(down))
             print(rotate)
             self.rotate2(rotate, useArrows, viewTour)
             return False, numberRotate

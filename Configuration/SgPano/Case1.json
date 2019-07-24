@@ -26,8 +26,8 @@
   "picturesData": {
                 "path":"Tour1",
                 "scenes": [
-                {"fileName":"first.jpg", "title":"First picture", "hotSpots":["Second picture:2717:up", "Third picture:937"]},
-                {"fileName":"second.jpg", "title":"Second picture","hotSpots":["Third picture:501", "First picture:299:down"]},
+                {"fileName":"first.jpg", "title":"First picture", "hotSpots":["Second picture:2717;up:1", "Third picture:937"]},
+                {"fileName":"second.jpg", "title":"Second picture","hotSpots":["Third picture:501", "First picture:299;down:3"]},
                 {"fileName":"Foto.jpg", "title":"Third picture", "hotSpots":["First picture:397"]}
                 ]
   },

@@ -54,7 +54,7 @@ else:
 
 cs = ConnectScenesTour(driver)
 log.info("Add, edit and delete info button")
-#when bug for adding info button in mobile mode is resolved, remove if
+#in chrome and firefox when info is added, and scroll is used, sometimes it cannot be added. without scroll it works.
 if not DriverData.mobile:
     cs.stop_rotate()
     cs.add_info_button_center("title", "name", "https://sgpano.com/")
@@ -76,8 +76,8 @@ cs.goTo_hotSpot_center()
 cs.change_current_scene("First picture")
 cs.stop_rotate()
 #uncomment when bug above is resolved
-if not DriverData.mobile:
-    cs.delete_hotSpotOrInfo_center()
+#if not DriverData.mobile:
+cs.delete_hotSpotOrInfo_center()
 
 log.info("Insert defined hotSpots")
 if not createDriver.driverName == "Safari":
