@@ -23,4 +23,4 @@ db = Dashboard(driver)
 db.go_to_edit_profile()
 
 epp = EditProfile(driver)
-epp.edit_profile("name", "contact", "email", "description")
+epp.edit_profile(cl.get("editName"), cl.get("editContact"), cl.get("editEmail"), cl.get("editDescription"))

@@ -10,7 +10,10 @@
 
   "facebookEmail": "email2",
   "facebookPass": "pass2",
-
+  "editName": "name",
+  "editContact": "contact",
+  "editEmail": "email",
+  "editDescription": "description",
   "usernameTrial": "newUsername",
   "passwordTrial": "newPassword",
   "emailTrial": "smirad91@gmail.com",

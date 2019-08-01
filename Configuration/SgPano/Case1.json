@@ -15,6 +15,12 @@
   "passwordTrial": "Kjdld2019#",
   "emailTrial": "smirfad92ccc1@gmail.com",
 
+  "editName": "name",
+  "editContact": "contact",
+  "editEmail": "email",
+  "editDescription": "description",
+
+
   "usernameBasic": "testusername",
   "passwordBasic": "fhfyffgggfjjffff#",
   "emailBasic": "testusername@gmail.com",
