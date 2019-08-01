@@ -48,8 +48,7 @@ class DriverData:
         if platform.system() in "Windows":
             from ctypes import windll
             if windll.user32.BlockInput(True) == 0:
-                pass
-               #raise Exception("Not running script as admin")
+                raise Exception("Not running script as admin")
         if is_forwarded("browser") is not None:
             driver = is_forwarded("browser")
         DriverData.driverName = driver
