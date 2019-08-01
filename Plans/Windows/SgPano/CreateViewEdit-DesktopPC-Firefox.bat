@@ -8,11 +8,12 @@ cd Tests/SgPano
 python CreateTour.py --browser=Firefox
 if ERRORLEVEL 1 pause
 python ViewTour.py --browser=Firefox
-if ERRORLEVEL 1 pause
+if ERRORLEVEL 1 (python RemoveTour.py --browser=Firefox
+pause)
 python EditTour.py --browser=Firefox
-if ERRORLEVEL 1 pause
+if ERRORLEVEL 1 (python RemoveTour.py --browser=Firefox
+pause)
 python RemoveTour.py --browser=Firefox
-if ERRORLEVEL 1 pause
 
 
 pause
