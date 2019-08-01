@@ -9,10 +9,12 @@ if [ "$?" -ne "0" ]; then
 fi
 python3 ViewTour.py --browser=Safari
 if [ "$?" -ne "0" ]; then
+    python3 RemoveTour.py --browser=Safari
 	exit 1
 fi
 python3 EditTourSafari.py --browser=Safari
 if [ "$?" -ne "0" ]; then
+    python3 RemoveTour.py --browser=Safari
 	exit 1
 fi
 python3 RemoveTour.py --browser=Safari
