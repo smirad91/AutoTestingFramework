@@ -46,6 +46,7 @@ class UploadedScenesTour(CommonAction):
                     inputTitle.send_keys(picture.title)
                     time.sleep(1)
                     break
+        time.sleep(1)
         self.btnNext().click()
         wait_until(lambda: check_if_elem_exist(ConnectScenesTour(self.driver).btnHotSpot), timeout=30, period=2)
         self.log.screenshot("Button next executed")

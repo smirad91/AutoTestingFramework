@@ -157,6 +157,7 @@ class DriverData:
             DriverData.mobileHeight = size["height"]
             DriverData.mobileWidth = size["width"]
             driver.set_window_size(size["width"], size["height"])
+            driver.set_window_position(0,0)
         else:
             driver.maximize_window()
         return driver

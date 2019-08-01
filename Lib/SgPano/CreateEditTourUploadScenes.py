@@ -71,7 +71,6 @@ class UploadScenesTour(CommonAction):
         wait_page_load(self.driver)
         self.btnUpload().click()
         wait_page_load(self.driver)
-        #time.sleep(7)
         pyautogui.keyDown("win")
         pyautogui.keyDown("shift")
         pyautogui.typewrite("g")

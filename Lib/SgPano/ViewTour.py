@@ -88,17 +88,6 @@ class ViewTour:
 
                 if hotSpotLocationWidth>0 and hotSpotLocationWidth<centerOfBrowser*2 and abs(abs(hotSpotLocationWidth + size["width"]/2) - centerOfBrowser) < limit:  #allowed error of 500 pixels
                     self.log.screenshot("Hotspot is in center")
-                    # self.log.info("Check if going to scene is as wanted")
-                    # print("************")
-                    # print(hotSpot.get_attribute("style"))
-                    # print(hotSpot.get_attribute("class"))
-                    # print(hotSpot.find_element_by_tag_name("span").find_element_by_tag_name("div").text)
-                    # print("************")
-                    # if not check_if_elem_exist(lambda: hotSpot.find_element_by_xpath(
-                    #         "//span[contains(text(),'{}')]".format(goingToScene))):
-                    #     self.log.info("HotSpot is not showing to {}".format(goingToScene))
-                    #     break
-                    # self.log.info("GointTo scene is as wanted")
                     return True
             except Exception as ex:
                 pass
@@ -121,7 +110,6 @@ class ViewTour:
                 size = hotSpot.size
                 browserX = self.driver.find_element_by_tag_name("body").size["width"]
                 self.log.info("Check if hotspot with x location={} is on view={}".format(hotSpotLocationWidth, browserX))
-                #if browserX - (hotSpotLocationWidth + size["width"]) > 0:
                 if hotSpotLocationWidth>=0 and hotSpotLocationWidth<self.tourImage().size["width"]:
                     self.log.screenshot("Hotspot is on view")
                     return True
@@ -143,37 +131,30 @@ class ViewTour:
         for scene in scenes:
             time.sleep(1)
             self.open_scene(scene.title)
-           # if not DriverData.mobile is True:
-            for i in range(5):
-                connect_scene.btnZoomOut().click()
-            self.log.screenshot("****Nova scena otvorena")
-            #self.tourImage().click()
+            if "Safari" in DriverData.driverName and view:
+                for i in range(2):
+                    connect_scene.btnZoomOut().click()
+            else:
+                for i in range(5):
+                    connect_scene.btnZoomOut().click()
             for i, hotSpot in enumerate(scene.hotSpots):
                 number_rotate = cst.get_number_rotate(hotSpot.location, scene.width)
-                print(type(number_rotate[0]))
-                print(number_rotate[0])
                 if number_rotate[0]:
                     where = "right"
                 else:
                     where = "left"
-                self.log.screenshot("***pocinje rotate prvi")
                 cst.rotate2(["{}:{}".format(where, number_rotate[1])], False, view)
-                self.log.screenshot("***zavrsen rotate prvi")
                 time.sleep(2)
                 if view:
                     self._check_hotSpot_on_view()
                 else:
                     self._check_hotSpot_in_center(hotSpot.goingToScene, view)
                 time.sleep(2)
-                print(0)
                 if not number_rotate[0]:
-                    print(1)
                     where2 = "right"
                 else:
-                    print(2)
                     where2 = "left"
                 if i < len(scene.hotSpots)-1:
-                    self.log.screenshot("***pocinje rotate drugi")
                     rotate = []
                     if not view:
                         if hotSpot.up:
@@ -182,14 +163,4 @@ class ViewTour:
                             rotate.append("up:3")
                     rotate.append("{}:{}".format(where2, number_rotate[1]))
                     cst.rotate2(rotate, False, view)
-                    self.log.screenshot("***zavrsen rotate drugi")
-                #     print(1)
-                #     if rotateInfo[1] > 1:
-                #         print(2)
-                #         cst.rotate(not rotateInfo[0], 1, True)
-                #         cst.rotate(not rotateInfo[0], rotateInfo[1]-1, False)
-                #     else:
-                #         print(3)
-                #         cst.rotate(not rotateInfo[0], 1, True)
-                self.log.screenshot("*****zavrsen prvi hotspot")
 

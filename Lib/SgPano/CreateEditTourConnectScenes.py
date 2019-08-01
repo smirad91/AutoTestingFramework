@@ -3,7 +3,7 @@ Class for manipulating with page https://sgpano.com/connect-scenes/
 """
 
 import pyautogui
-from selenium_move_cursor.MouseActions import move_to_element_chrome
+#from selenium_move_cursor.MouseActions import move_to_element_chrome
 from selenium.webdriver import ActionChains
 import time
 from Lib.common.CommonAction import CommonAction, get_hotSpots, move_mouse_to_element
@@ -205,18 +205,18 @@ class ConnectScenesTour(CommonAction):
             button = self.btnInfo
         oneScrollPixels = self._get_hotSpot_scroll_pixels(hotSpot)
 
-        scroll_element_to_center(self.driver, self.log, self.btnHotSpot())
-        fromLocation = get_location(self.driver, self.btnHotSpot())
+        scroll_element_to_center(self.driver, self.log, button())
+        fromLocation = get_location(self.driver, button())
         toLocation = get_location(self.driver, self.tourImage())
 
         scrollToBottom = self.driver.execute_script("return window.pageYOffset") + int(
             self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
-
+        # if not hotSpot:
+        #     scrollToBottom -= 37
         moveFor = toLocation["y"] + self.tourImage().size["height"] / 2 - (
                 self.driver.execute_script("return window.pageYOffset") + int(
             self.driver.execute_script("return window.innerHeight"))) + int(
             self.driver.execute_script("return window.innerHeight") / 2)
-        # print("moveFor {}".format(moveFor))
         numberOfMoves = int(moveFor / oneScrollPixels)
 
         wantedX = toLocation["x"] + int(self.tourImage().size["width"] / 2)
@@ -229,17 +229,13 @@ class ConnectScenesTour(CommonAction):
             button().size["height"] / 2) + scrollToBottom + oneScrollPixels * numberOfMoves
         x = wantedX - currentX
         y = wantedY - currentY
-        # print("x: {}".format(x))
-        # print("y: {}".format(y))
         time.sleep(1)
-        # print("numberOfmoves {}".format(numberOfMoves))
-        # print("scroll to bottom {}".format(scrollToBottom))
         ac = ActionChains(self.driver)
-        ac.move_to_element(self.btnHotSpot()).click_and_hold()
+        ac.move_to_element(button()).click_and_hold()
 
         self.drag_with_hotspot_safari(ac, scrollToBottom, numberOfMoves, x, y)
 
-        ActionChains(self.driver).release().perform()
+        ActionChains(self.driver).click().perform()
 
     def _get_hotSpot_scroll_pixels(self, hotSpot):
         """
@@ -263,8 +259,6 @@ class ConnectScenesTour(CommonAction):
         action_chains.click_and_hold()
         scrollFor = self.driver.execute_script("return window.pageYOffset") + int(
             self.driver.execute_script("return window.innerHeight")) - fromLocation["y"] - 25
-        #print(scrollFor)
-        #print(type(scrollFor))
         action_chains.move_by_offset(0, scrollFor)
         #action_chains.move_by_offset(10, 0)
 
@@ -275,7 +269,6 @@ class ConnectScenesTour(CommonAction):
         action_chains.perform()
         hiddenPixelsAfter = get_hidden_pixels(self.driver)
         scrolledPixels = hiddenPixelsAfter - hiddenPixels
-        #print("pixels {}".format(scrolledPixels))
         self.driver.execute_script("scroll(0,{})".format(startHidenPixels))
         return scrolledPixels
 
@@ -296,7 +289,6 @@ class ConnectScenesTour(CommonAction):
             moveToSide *= -1
         act.move_by_offset(x,y)
         act.perform()
-        #return moveToSide
 
     def _add_info_data(self, title, detail, url, mode="set"):
         """
@@ -369,13 +361,14 @@ class ConnectScenesTour(CommonAction):
         :param clickNumber: Number of times to click on arrow
         :type clickNumber: int
         """
+        wait_until(self.btnLeftRotate)
         self.log.info("Execute method rotate with parameters right={}, clickNumber={}".format(right, clickNumber))
         if clickNumber != 0:
             if not useArrows:
                 if DriverData.driverName == "Chrome" and DriverData.mobile is False:
                     for i in range(clickNumber):
                         time.sleep(5)
-                        move_to_element_chrome(self.driver, self.tourImage(), 100)
+                      #  move_to_element_chrome(self.driver, self.tourImage(), 100)
                         pyautogui.mouseDown()
                         #moveFor = int(int(self.tourImage().size["width"]) / 58)
                         moveFor = int(int(self.tourImage().size["width"]) / 8)
@@ -419,7 +412,7 @@ class ConnectScenesTour(CommonAction):
         :param move: List of strings where to move. Order is important. Example ["left:2","right:5","up:1","down:1"]
         :type move: list
         """
-        self.log.info("Execute method rotate with parametersssssssss move={}".format(move))
+        self.log.info("Execute method rotate with parameters move={}".format(move))
         for move_to in move:
             move_number = move_to.split(":")
             move_where = move_number[0]
@@ -444,44 +437,29 @@ class ConnectScenesTour(CommonAction):
                     self.log.screenshot("Hotspot is on center")
                     return (abs(int(hotSpotLocationWidth - 125 - browserX / 2)),
                             abs(int(hotSpotLocationWidth + 175 - browserX / 2)))  # desno, levo
-
-                # if browserX/2 > hotSpotLocationWidth-125 and browserX/2 > hotSpotLocationWidth+175:
-                #     self.log.screenshot("Hotspot is on center")
-                #     return (abs(int(hotSpotLocationWidth-125-browserX/2)), abs(int(hotSpotLocationWidth+175-browserX/2)))#desno, levo
             except:
                 pass
         return (0,0)
 
     def view_tour(self, where, number):
-        #if DriverData.mobile is True and "Portrait" in DriverData.orientation:
         number = number*2
         for i in range(number):
-            self.log.screenshot("iiii: {}".format(i))
             time.sleep(2)
             moveForX = int(int(self.tourImage().size["width"]) / 8)
             moveForY = int(int(self.tourImage().size["height"]) / 8)
             ac = ActionChains(self.driver)
             if not self._check_hotSpot_on_view():
-                self.log.screenshot("nije na centru")
                 ac.move_to_element(self.tourImage())
             else:
                 if i == 0:
                     ac.move_to_element(self.tourImage())
-                    self.log.info("pomeri za 5 dole")
                     hs_loc = self.where_to_move_edit_and_view()
-                    print(hs_loc)
-                    print(hs_loc[0])
-                    print(type(hs_loc))
-                    print(type(hs_loc[0]))
                     if where =="right":
                         ac.move_by_offset(-1 * hs_loc[0],0)
                     elif where == "left":
                         ac.move_by_offset(hs_loc[1], 0)
                 else:
                     break
-            # if self.get_hotspot_location():
-            #     ac.move_by_offset()
-            self.log.screenshot("nastavio posle brejk")
             ac.click_and_hold()
 
             if where == "right":
@@ -493,9 +471,11 @@ class ConnectScenesTour(CommonAction):
             elif where == "down":
                 ac.move_by_offset(0, moveForY)
             ac.release()
-            ac.perform()
+            try:
+                ac.perform()
+            except:
+                pass
             time.sleep(2)
-            self.log.screenshot("prvi je pomeri na centar izvrsenoooooooooo jedno pomeranje")
 
 
     def is_hs_on_center(self):
@@ -509,7 +489,6 @@ class ConnectScenesTour(CommonAction):
                 self.log.info("Check if hotspot with x location={} is on center={}".format(hotSpotLocationWidth, centerOfBrowser))
                 if abs(self.tourImage().size["width"]/2 - hotSpotLocationWidth) <= 55:
                     return True
-                #y check
         except:
             pass
         return False
@@ -529,10 +508,8 @@ class ConnectScenesTour(CommonAction):
                 translate = hotSpotLocation.split("translate(")[1].split("px")[0]
                 hotSpotLocationWidth = int(translate.split(".")[0])
                 size = hotSpot.size
-                #browserX = self.driver.find_element_by_tag_name("body").size["width"]
                 browserX = self.tourImage().size["width"]
                 self.log.info("Check if hotspot with x location={} is on view={}".format(hotSpotLocationWidth, browserX))
-                #if browserX - (hotSpotLocationWidth + size["width"]) > 0 and browserX - (hotSpotLocationWidth + size["width"]) < browserX:
                 if hotSpotLocationWidth >= 0 and hotSpotLocationWidth <= browserX:
                     self.log.screenshot("Hotspot is on view")
                     return True
@@ -554,7 +531,6 @@ class ConnectScenesTour(CommonAction):
                     self.btnLeftRotate().click()
         else:
             for i in range(number):
-                self.log.screenshot("iiii: ",i)
                 time.sleep(2)
                 moveForX = int(int(self.tourImage().size["width"]) / 8)
                 moveForY = int(int(self.tourImage().size["height"]) / 8)
@@ -584,8 +560,6 @@ class ConnectScenesTour(CommonAction):
                     ac.release()
                     ac.perform()
                     time.sleep(2)
-                    self.log.screenshot("prvi je pomeri na centar izvrsenoooooooooo jedno pomeranje")
-
 
     def get_number_rotate(self, pixels, width):
         oneMove = int(width / 36)  # 36 is number of clicking on rotate for 360
@@ -615,6 +589,8 @@ class ConnectScenesTour(CommonAction):
         :rtype: bool, int
         """
         self.log.info("Execute method rotate_scene with parameters pixels={}, width={}".format(pixels, width))
+        scroll_element_to_center(self.driver, self.log, self.tourImage())
+
         oneMove = int(width/36)      #36 is number of clicking on rotate for 360
         if width/2 > pixels:
             #move left
@@ -625,7 +601,6 @@ class ConnectScenesTour(CommonAction):
                 rotate.append("up:{}".format(up))
             elif down:
                 rotate.append("down:{}".format(down))
-            print(rotate)
             self.rotate2(rotate, useArrows, viewTour)
             return False, numberRotate
         else:
@@ -707,17 +682,6 @@ class ConnectScenesTour(CommonAction):
             self.change_current_scene(scene.title)
             self.stop_rotate()
             for hotSpot in scene.hotSpots:
-                # self.add_button_to_center()
-                # self._set_hotSpot_goingTo(hotSpot.goingToScene)
-                # self.save_hotSpot()
-                # hsCenter = self.get_hotspot_from_center()
-                # print("pre {}".format(hsCenter.location))
-                # for i in range(36):
-                #     print(i)
-                #     self.btnRighRotate().click()
-                #     time.sleep(3)
-                #     print("posle {}".format(hsCenter.location))
-                # time.sleep(1000)
                 self.rotate_scene(hotSpot.location, scene.width, useArrows=False, up=hotSpot.up, down=hotSpot.down)
                 self.add_button_to_center()
                 self._set_hotSpot_goingTo(hotSpot.goingToScene)
@@ -733,7 +697,6 @@ class ConnectScenesTour(CommonAction):
         ac = ActionChains(self.driver)
         ac.move_to_element(self.tourImage())
         ac.click_and_hold()
-        print(self.tourImage().size["width"] / 2)
         ac.move_by_offset(self.tourImage().size["width"] / 2, 0)
         ac.release()
         ac.perform()
@@ -743,7 +706,6 @@ class ConnectScenesTour(CommonAction):
         ac.move_to_element(self.tourImage())
         ac.move_by_offset(-1 * self.tourImage().size["width"] / 2,0)
         ac.click_and_hold()
-        print(self.tourImage().size["width"])
         ac.move_by_offset(self.tourImage().size["width"], 0)
         ac.release()
         ac.perform()
@@ -807,10 +769,6 @@ class ConnectScenesTour(CommonAction):
                 self.log.info(
                     "Check if hotspot with x location={} is on view={}".format(hotSpotLocationWidth, tourSceneSize))
                 limit = 50
-                # if abs(abs(hotSpotLocationWidth + size["width"]/2) - tourSceneCenter) <= tourSceneCenter/2 and hotSpotLocationWidth>=0:  #allowed error of 20 pixels
-                #     self.log.screenshot("Hotspot is in center")
-                #     hotSpotFound = hotSpot
-                #     return hotSpot
                 if hotSpotLocationWidth >= 0 and hotSpotLocationWidth <= tourSceneSize:
                     self.log.screenshot("Hotspot is on view")
                     hotSpotFound = hotSpot
@@ -891,6 +849,7 @@ class ConnectScenesTour(CommonAction):
         """
         self.log.info("Execute method add_info_button_center with parameters "
                       "title={}, name={}, url={}".format(title, name, url))
+        self.stop_rotate()
         self.add_button_to_center(hotSpot=False)
         self._add_info_data(title, name, url)
         self.log.info("Method add_info_button_center finished")
@@ -902,13 +861,14 @@ class ConnectScenesTour(CommonAction):
         self.log.info("Execute method edit_info_button_center with parameters "
                       "title={}, name={}, url={}".format(title, name, url))
         action_chains = ActionChains(self.driver)
+        time.sleep(2)
         self.open_menu_hotSpotOrInfo_center()
         time.sleep(2)
         action_chains.click(self.divHotSpotMenu().find_element_by_css_selector("a[onclick*='onInfoEdit']")).perform()
         time.sleep(2)
         scroll_element_to_center(self.driver, self.log, self.get_hotspot_from_center())
         move_mouse_to_middle_of_browser(self.log, self.driver)
-        action_chains.drag_and_drop_by_offset(self.get_hotspot_from_center(), 5, 0).perform()
+        ActionChains(self.driver).drag_and_drop_by_offset(self.get_hotspot_from_center(), 5, 0).perform()
         time.sleep(1)
         self._add_info_data(title, name, url, "update")
 

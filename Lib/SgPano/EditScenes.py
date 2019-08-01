@@ -71,6 +71,7 @@ class EditScenes:
         scene = self.find_scene_by_name(name)
         if scene:
             self.log.info("Click on delete button")
+            time.sleep(3)
             scene.find_element_by_css_selector("a[class='scene_remove']").find_element_by_tag_name("i").click()
             wait_until(lambda: check_if_elem_exist(self.btnDeleteOk), timeout=30)
             try:
@@ -129,7 +130,6 @@ class EditScenes:
         scene = self.find_scene_by_name(name)
         if scene:
             #scene.find_element_by_css_selector("a[title='Edit']").click()
-            print(scene.find_elements_by_css_selector("a[title='Edit']")[1].get_attribute("href"))
             scene.find_elements_by_css_selector("a[title='Edit']")[1].find_element_by_tag_name("i").click()
             time.sleep(2)
             self.log.info("Scene found and clicked on edit button")
